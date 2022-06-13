@@ -1,0 +1,13 @@
+[package]
+name = "raekna-parser"
+version = "0.1.0"
+authors = ["Mathias Peters"]
+edition = "2021"
+description = "This crate provides the code needed to parse string slices into Expressions that can later be evaluated."
+license = "MPL-2.0"
+repository = "https://github.com/mathiaspeters/raekna"
+
+[dependencies]
+nom = "7.1"
+
+raekna-common = { path = "../raekna-common" }

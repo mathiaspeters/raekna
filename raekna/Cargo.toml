@@ -1,0 +1,22 @@
+[package]
+name = "raekna"
+version = "0.1.0"
+authors = ["Mathias Peters"]
+edition = "2021"
+description = "This crate combines the other crates in the workspace to make a functional program."
+license = "MPL-2.0"
+repository = "https://github.com/mathiaspeters/raekna"
+
+[dependencies]
+raekna-compute = { path = "../raekna-compute" }
+raekna-common  = { path = "../raekna-common" }
+raekna-parser  = { path = "../raekna-parser" }
+raekna-storage = { path = "../raekna-storage" }
+raekna-ui      = { path = "../raekna-ui" }
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "benchmarks"
+harness = false

@@ -1,0 +1,11 @@
+[package]
+name = "raekna-compute"
+version = "0.1.0"
+authors = ["Mathias Peters"]
+edition = "2021"
+description = "This crate allows evaluating expressions into literals."
+license = "MPL-2.0"
+repository = "https://github.com/mathiaspeters/raekna"
+
+[dependencies]
+raekna-common = { path = "../raekna-common" }

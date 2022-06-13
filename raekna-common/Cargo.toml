@@ -1,0 +1,10 @@
+[package]
+name = "raekna-common"
+version = "0.1.0"
+authors = ["Mathias Peters"]
+edition = "2021"
+description = "This crate contains common types and functionality for the raekna project."
+license = "MPL-2.0"
+repository = "https://github.com/mathiaspeters/raekna"
+
+[dependencies]

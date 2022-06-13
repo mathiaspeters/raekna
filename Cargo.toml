@@ -1,0 +1,15 @@
+[workspace]
+members = [
+        "raekna",
+        "raekna-common",
+        "raekna-compute",
+        "raekna-parser",
+        "raekna-storage",
+        "raekna-ui"
+]
+resolver = "2"
+
+[profile.dev]
+# Disabling debug info speeds up builds a bunch,
+# and we don't rely on it for debugging that much.
+debug = 0
