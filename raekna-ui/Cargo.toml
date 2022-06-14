@@ -8,13 +8,12 @@ license = "MPL-2.0"
 repository = "https://github.com/mathiaspeters/raekna"
 
 [dependencies]
-wgpu_glyph = "0.16"
-winit = "0.26"
-log = "0.4"
-env_logger = "0.9"
-wgpu = "0.12"
-futures-lite = "1.12"
 bytemuck = { version = "1.9", features = [ "derive" ] }
 copypasta = "0.7"
-
-raekna-common = { path = "../raekna-common" }
+env_logger = "0.9"
+futures-lite = "1.12"
+log = "0.4"
+raekna-common = "0.1.0"
+wgpu_glyph = "0.16"
+wgpu = "0.12"
+winit = "0.26"
