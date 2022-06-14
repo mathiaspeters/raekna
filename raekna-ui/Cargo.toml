@@ -17,4 +17,4 @@ futures-lite = "1.12"
 bytemuck = { version = "1.9", features = [ "derive" ] }
 copypasta = "0.7"
 
-raekna-common = { path = "../raekna-common" }
+raekna-common = "0.1.0"

@@ -9,7 +9,7 @@ repository = "https://github.com/mathiaspeters/raekna"
 
 [dependencies]
 raekna-compute = { path = "../raekna-compute" }
-raekna-common  = { path = "../raekna-common" }
+raekna-common  = "0.1.0"
 raekna-parser  = { path = "../raekna-parser" }
 raekna-storage = { path = "../raekna-storage" }
 raekna-ui      = { path = "../raekna-ui" }

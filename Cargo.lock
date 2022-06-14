@@ -1287,7 +1287,7 @@ name = "raekna"
 version = "0.1.0"
 dependencies = [
  "criterion",
- "raekna-common",
+ "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "raekna-compute",
  "raekna-parser",
  "raekna-storage",
@@ -1299,10 +1299,16 @@ name = "raekna-common"
 version = "0.1.0"
 
 [[package]]
+name = "raekna-common"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "066a839b4f24527e6d001ec4d2afe966a1f8b6bd7d9bdfcd2bd32791d9ef36fa"
+
+[[package]]
 name = "raekna-compute"
 version = "0.1.0"
 dependencies = [
- "raekna-common",
+ "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1310,14 +1316,14 @@ name = "raekna-parser"
 version = "0.1.0"
 dependencies = [
  "nom",
- "raekna-common",
+ "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-storage"
 version = "0.1.0"
 dependencies = [
- "raekna-common",
+ "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1329,7 +1335,7 @@ dependencies = [
  "env_logger",
  "futures-lite",
  "log",
- "raekna-common",
+ "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "wgpu",
  "wgpu_glyph",
  "winit",

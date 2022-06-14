@@ -10,4 +10,4 @@ repository = "https://github.com/mathiaspeters/raekna"
 [dependencies]
 nom = "7.1"
 
-raekna-common = { path = "../raekna-common" }
+raekna-common = "0.1.0"
