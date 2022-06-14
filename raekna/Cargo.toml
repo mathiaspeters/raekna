@@ -8,8 +8,8 @@ license = "MPL-2.0"
 repository = "https://github.com/mathiaspeters/raekna"
 
 [dependencies]
-raekna-compute = "0.1.0"
 raekna-common  = "0.1.0"
+raekna-compute = "0.1.0"
 raekna-parser  = "0.1.0"
 raekna-storage = "0.1.0"
 raekna-ui      = "0.1.0"
