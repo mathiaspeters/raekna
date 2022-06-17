@@ -19,7 +19,7 @@ Make sure your Rust toolchain is up-to-date to take advantage of the latest lang
 rustup update stable
 ```
 
-This project uses some unstable formatting options so you also need a nightly toolchain as well.
+This project uses some unstable formatting options so you also need a nightly toolchain.
 
 ```bash
 # Install if you don't already have a nightly toolchain
