@@ -9,7 +9,7 @@ repository = "https://github.com/mathiaspeters/raekna"
 
 [dependencies]
 bytemuck = { version = "1.9", features = [ "derive" ] }
-copypasta = "0.7"
+copypasta = "0.8"
 env_logger = "0.9"
 futures-lite = "1.12"
 log = "0.4"
