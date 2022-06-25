@@ -1,6 +1,6 @@
 [package]
 name = "raekna-ui"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Mathias Peters"]
 edition = "2021"
 description = "This crate contains functionality to draw a plain text calculator using wgpu."
@@ -13,7 +13,7 @@ copypasta = "0.8"
 env_logger = "0.9"
 futures-lite = "1.12"
 log = "0.4"
-raekna-common = "0.1.0"
+raekna-common = "0.1"
 wgpu_glyph = "0.16"
 wgpu = "0.12"
 winit = "0.26"
