@@ -157,7 +157,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bf2eec61efe56aa1e813f5126959296933cf0700030e4314786c48779a66ab82"
 dependencies = [
  "log",
- "nix",
+ "nix 0.22.3",
 ]
 
 [[package]]
@@ -263,30 +263,16 @@ checksum = "a2df960f5d869b2dd8532793fde43eb5427cceb126c929747a26823ab0eeb536"
 
 [[package]]
 name = "copypasta"
-version = "0.7.1"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4423d79fed83ebd9ab81ec21fa97144300a961782158287dc9bf7eddac37ff0b"
+checksum = "d7216b5c1e9ad3867252505995b02d01c6fa7e6db0d8abd42634352ef377777e"
 dependencies = [
  "clipboard-win",
  "objc",
  "objc-foundation",
  "objc_id",
  "smithay-clipboard",
- "x11-clipboard 0.5.3",
-]
-
-[[package]]
-name = "copypasta"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60490f5fad15cd9aff7d8f34bb8e5230bc592ef098e4298fa5a81e90b7722864"
-dependencies = [
- "clipboard-win",
- "objc",
- "objc-foundation",
- "objc_id",
- "smithay-clipboard",
- "x11-clipboard 0.6.1",
+ "x11-clipboard",
 ]
 
 [[package]]
@@ -444,9 +430,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-utils"
-version = "0.8.9"
+version = "0.8.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ff1f980957787286a554052d03c7aee98d99cc32e09f6d45f0a814133c87978"
+checksum = "7d82ee10ce34d7bc12c2122495e7593a9c41347ecdd64185af4ecf72cb1a7f83"
 dependencies = [
  "cfg-if 1.0.0",
  "once_cell",
@@ -783,9 +769,9 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 
 [[package]]
 name = "indexmap"
-version = "1.9.0"
+version = "1.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c6392766afd7964e2531940894cffe4bd8d7d17dbc3c1c4857040fd4b33bdb3"
+checksum = "10a35a97730320ffe8e2d410b5d3b69279b98d2c14bdb8b70ea89ecf7888d41e"
 dependencies = [
  "autocfg",
  "hashbrown 0.12.1",
@@ -933,6 +919,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "memmap2"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d5172b50c23043ff43dd53e51392f36519d9b35a8f3a410d30ece5d1aedd58ae"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "memoffset"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -963,9 +958,9 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "mio"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "713d550d9b44d89174e066b7a6217ae06234c10cb47819a88290d2b353c31799"
+checksum = "57ee1c23c7c63b0c9250c339ffdc69255f110b298b901b9f6c82547b7b87caaf"
 dependencies = [
  "libc",
  "log",
@@ -1055,6 +1050,17 @@ dependencies = [
  "cfg-if 1.0.0",
  "libc",
  "memoffset",
+]
+
+[[package]]
+name = "nix"
+version = "0.24.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f17df307904acd05aa8e32e97bb20f2a0df1728bbc2d771ae8f9a90463441e9"
+dependencies = [
+ "bitflags",
+ "cfg-if 1.0.0",
+ "libc",
 ]
 
 [[package]]
@@ -1271,9 +1277,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.39"
+version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c54b25569025b7fc9651de43004ae593a75ad88543b17178aa5e1b9c4f15f56f"
+checksum = "dd96a1e8ed2596c337f8eae5f24924ec83f5ad5ab21ea8e455d3566c69fbcaf7"
 dependencies = [
  "unicode-ident",
 ]
@@ -1295,95 +1301,95 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.18"
+version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1feb54ed693b93a84e14094943b84b7c4eae204c512b7ccb95ab0c66d278ad1"
+checksum = "3bcdf212e9776fbcb2d23ab029360416bb1706b1aea2d1a5ba002727cbcab804"
 dependencies = [
  "proc-macro2",
 ]
 
 [[package]]
 name = "raekna"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "criterion",
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "raekna-compute 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "raekna-parser 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "raekna-storage 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "raekna-ui 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-compute 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-parser 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-storage 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-ui 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-common"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "raekna-common"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "066a839b4f24527e6d001ec4d2afe966a1f8b6bd7d9bdfcd2bd32791d9ef36fa"
+checksum = "89ceeb1fa771f5460b93bc4b8aa4c40e6c09991ab303858dc08ee9b4d8792277"
 
 [[package]]
 name = "raekna-compute"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-compute"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b935445be82de98e5120abed05feada3dbffcf3fa0e653d32ca24adf522a272"
+checksum = "f016711004d5c26888cf7734846ddeae4cb16ef11d9cdba7e991b664dd2e66e9"
 dependencies = [
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-parser"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "nom",
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-parser"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2a7418246f9a9c9e91afd61818d81d56b7ba8079c9ac2abcd89600aac574dce"
+checksum = "fe429dfb02e5ec19ed41514bc50160fa69e61fec4d9c82bccc12c8dec8038ef8"
 dependencies = [
  "nom",
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-storage"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-storage"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15742c8f00dfa75966cf6ab9c212896fdbfd2a8b938fd751c03024f43e2a30ba"
+checksum = "466d6bb714de91c3ce9799b1b5783e7e34766590552dfdb9e55e6eaca602495e"
 dependencies = [
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-ui"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bytemuck",
- "copypasta 0.8.0",
+ "copypasta",
  "env_logger",
  "futures-lite",
  "log",
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "wgpu",
  "wgpu_glyph",
  "winit",
@@ -1391,16 +1397,16 @@ dependencies = [
 
 [[package]]
 name = "raekna-ui"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6450cee276e6ec7a8dbe02045e617eefdaf408b1fd7aaac7cb2f081543c715a5"
+checksum = "33a03a81ec0fa43c0e7a2e072c7175c74991903dfffc7757899a9fefb895978c"
 dependencies = [
  "bytemuck",
- "copypasta 0.7.1",
+ "copypasta",
  "env_logger",
  "futures-lite",
  "log",
- "raekna-common 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "wgpu",
  "wgpu_glyph",
  "winit",
@@ -1610,9 +1616,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.8.0"
+version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2dd574626839106c320a323308629dcb1acfc96e32a8cba364ddc61ac23ee83"
+checksum = "cc88c725d61fc6c3132893370cac4a0200e3fedf5da8331c570664b1987f5ca2"
 
 [[package]]
 name = "smithay-client-toolkit"
@@ -1625,8 +1631,26 @@ dependencies = [
  "dlib",
  "lazy_static",
  "log",
- "memmap2",
- "nix",
+ "memmap2 0.3.1",
+ "nix 0.22.3",
+ "pkg-config",
+ "wayland-client",
+ "wayland-cursor",
+ "wayland-protocols",
+]
+
+[[package]]
+name = "smithay-client-toolkit"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f307c47d32d2715eb2e0ece5589057820e0e5e70d07c247d1063e844e107f454"
+dependencies = [
+ "bitflags",
+ "dlib",
+ "lazy_static",
+ "log",
+ "memmap2 0.5.4",
+ "nix 0.24.1",
  "pkg-config",
  "wayland-client",
  "wayland-cursor",
@@ -1635,11 +1659,11 @@ dependencies = [
 
 [[package]]
 name = "smithay-clipboard"
-version = "0.6.5"
+version = "0.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "610b551bd25378bfd2b8e7a0fcbd83d427e8f2f6a40c47ae0f70688e9949dd55"
+checksum = "0a345c870a1fae0b1b779085e81b51e614767c239e93503588e54c5b17f4b0e8"
 dependencies = [
- "smithay-client-toolkit",
+ "smithay-client-toolkit 0.16.0",
  "wayland-client",
 ]
 
@@ -1667,9 +1691,9 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
-version = "1.0.96"
+version = "1.0.98"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0748dd251e24453cb8717f0354206b91557e4ec8703673a4b30208f2abaf1ebf"
+checksum = "c50aef8a904de4c23c788f104b7dddc7d6f79c647c7c8ce4cc8f73eb0ca773dd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1866,7 +1890,7 @@ dependencies = [
  "bitflags",
  "downcast-rs",
  "libc",
- "nix",
+ "nix 0.22.3",
  "scoped-tls",
  "wayland-commons",
  "wayland-scanner",
@@ -1879,7 +1903,7 @@ version = "0.29.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94f6e5e340d7c13490eca867898c4cec5af56c27a5ffe5c80c6fc4708e22d33e"
 dependencies = [
- "nix",
+ "nix 0.22.3",
  "once_cell",
  "smallvec",
  "wayland-sys",
@@ -1891,7 +1915,7 @@ version = "0.29.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c52758f13d5e7861fc83d942d3d99bf270c83269575e52ac29e5b73cb956a6bd"
 dependencies = [
- "nix",
+ "nix 0.22.3",
  "wayland-client",
  "xcursor",
 ]
@@ -2141,7 +2165,7 @@ dependencies = [
  "parking_lot",
  "percent-encoding",
  "raw-window-handle",
- "smithay-client-toolkit",
+ "smithay-client-toolkit 0.15.4",
  "wasm-bindgen",
  "wayland-client",
  "wayland-protocols",
@@ -2152,20 +2176,11 @@ dependencies = [
 
 [[package]]
 name = "x11-clipboard"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "473068b7b80ac86a18328824f1054e5e007898c47b5bbc281bd7abe32bc3653c"
-dependencies = [
- "xcb 0.10.1",
-]
-
-[[package]]
-name = "x11-clipboard"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a7468a5768fea473e6c8c0d4b60d6d7001a64acceaac267207ca0281e1337e8"
 dependencies = [
- "xcb 1.1.1",
+ "xcb",
 ]
 
 [[package]]
@@ -2177,17 +2192,6 @@ dependencies = [
  "lazy_static",
  "libc",
  "pkg-config",
-]
-
-[[package]]
-name = "xcb"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "771e2b996df720cd1c6dd9ff90f62d91698fd3610cc078388d0564bdd6622a9c"
-dependencies = [
- "libc",
- "log",
- "quick-xml",
 ]
 
 [[package]]
