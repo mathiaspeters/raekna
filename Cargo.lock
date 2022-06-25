@@ -263,20 +263,6 @@ checksum = "a2df960f5d869b2dd8532793fde43eb5427cceb126c929747a26823ab0eeb536"
 
 [[package]]
 name = "copypasta"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4423d79fed83ebd9ab81ec21fa97144300a961782158287dc9bf7eddac37ff0b"
-dependencies = [
- "clipboard-win",
- "objc",
- "objc-foundation",
- "objc_id",
- "smithay-clipboard",
- "x11-clipboard 0.5.3",
-]
-
-[[package]]
-name = "copypasta"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7216b5c1e9ad3867252505995b02d01c6fa7e6db0d8abd42634352ef377777e"
@@ -286,7 +272,7 @@ dependencies = [
  "objc-foundation",
  "objc_id",
  "smithay-clipboard",
- "x11-clipboard 0.6.1",
+ "x11-clipboard",
 ]
 
 [[package]]
@@ -1324,14 +1310,14 @@ dependencies = [
 
 [[package]]
 name = "raekna"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "criterion",
  "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "raekna-compute 0.1.0",
- "raekna-parser 0.1.0",
- "raekna-storage 0.1.0",
- "raekna-ui 0.1.0",
+ "raekna-compute 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-parser 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-storage 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-ui 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1346,9 +1332,7 @@ checksum = "89ceeb1fa771f5460b93bc4b8aa4c40e6c09991ab303858dc08ee9b4d8792277"
 
 [[package]]
 name = "raekna-compute"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b935445be82de98e5120abed05feada3dbffcf3fa0e653d32ca24adf522a272"
+version = "0.1.1"
 dependencies = [
  "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -1356,17 +1340,9 @@ dependencies = [
 [[package]]
 name = "raekna-compute"
 version = "0.1.1"
-dependencies = [
- "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "raekna-parser"
-version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2a7418246f9a9c9e91afd61818d81d56b7ba8079c9ac2abcd89600aac574dce"
+checksum = "f016711004d5c26888cf7734846ddeae4cb16ef11d9cdba7e991b664dd2e66e9"
 dependencies = [
- "nom",
  "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -1379,10 +1355,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "raekna-storage"
-version = "0.1.0"
+name = "raekna-parser"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15742c8f00dfa75966cf6ab9c212896fdbfd2a8b938fd751c03024f43e2a30ba"
+checksum = "fe429dfb02e5ec19ed41514bc50160fa69e61fec4d9c82bccc12c8dec8038ef8"
+dependencies = [
+ "nom",
+ "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "raekna-storage"
+version = "0.1.1"
 dependencies = [
  "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -1390,18 +1374,18 @@ dependencies = [
 [[package]]
 name = "raekna-storage"
 version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "466d6bb714de91c3ce9799b1b5783e7e34766590552dfdb9e55e6eaca602495e"
 dependencies = [
  "raekna-common 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "raekna-ui"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6450cee276e6ec7a8dbe02045e617eefdaf408b1fd7aaac7cb2f081543c715a5"
+version = "0.1.1"
 dependencies = [
  "bytemuck",
- "copypasta 0.7.1",
+ "copypasta",
  "env_logger",
  "futures-lite",
  "log",
@@ -1414,9 +1398,11 @@ dependencies = [
 [[package]]
 name = "raekna-ui"
 version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33a03a81ec0fa43c0e7a2e072c7175c74991903dfffc7757899a9fefb895978c"
 dependencies = [
  "bytemuck",
- "copypasta 0.8.1",
+ "copypasta",
  "env_logger",
  "futures-lite",
  "log",
@@ -2190,20 +2176,11 @@ dependencies = [
 
 [[package]]
 name = "x11-clipboard"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "473068b7b80ac86a18328824f1054e5e007898c47b5bbc281bd7abe32bc3653c"
-dependencies = [
- "xcb 0.10.1",
-]
-
-[[package]]
-name = "x11-clipboard"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a7468a5768fea473e6c8c0d4b60d6d7001a64acceaac267207ca0281e1337e8"
 dependencies = [
- "xcb 1.1.1",
+ "xcb",
 ]
 
 [[package]]
@@ -2215,17 +2192,6 @@ dependencies = [
  "lazy_static",
  "libc",
  "pkg-config",
-]
-
-[[package]]
-name = "xcb"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "771e2b996df720cd1c6dd9ff90f62d91698fd3610cc078388d0564bdd6622a9c"
-dependencies = [
- "libc",
- "log",
- "quick-xml",
 ]
 
 [[package]]
