@@ -182,62 +182,140 @@ mod operators {
 
     #[test]
     fn add() {
-        let input = "5 + 10";
+        ["5 + 10", "5 +10", "5+ 10", "5+10"]
+            .iter()
+            .for_each(|input| {
+                let expected = add_expr(vec![int(5), int(10)]);
+                let actual = parse(input);
 
-        let expected = add_expr(vec![int(5), int(10)]);
-        let actual = parse(input);
-
-        assert_eq!(actual, expected);
+                assert_eq!(actual, expected);
+            });
     }
 
     #[test]
     fn subtract() {
-        let input = "5 - 10";
+        ["5 - 10", "5 -10", "5- 10", "5-10"]
+            .iter()
+            .for_each(|input| {
+                let expected = sub_expr(vec![int(5), int(10)]);
+                let actual = parse(input);
 
-        let expected = sub_expr(vec![int(5), int(10)]);
-        let actual = parse(input);
-
-        assert_eq!(actual, expected);
+                assert_eq!(actual, expected);
+            });
     }
 
     #[test]
     fn multiply() {
-        let input = "5 * 10";
+        ["5 * 10", "5 *10", "5* 10", "5*10"]
+            .iter()
+            .for_each(|input| {
+                let expected = mul_expr(vec![int(5), int(10)]);
+                let actual = parse(input);
 
-        let expected = mul_expr(vec![int(5), int(10)]);
-        let actual = parse(input);
-
-        assert_eq!(actual, expected);
+                assert_eq!(actual, expected);
+            });
     }
 
     #[test]
     fn division() {
-        let input = "5 / 10";
+        ["5 / 10", "5 /10", "5/ 10", "5/10"]
+            .iter()
+            .for_each(|input| {
+                let expected = div_expr(vec![int(5), int(10)]);
+                let actual = parse(input);
 
-        let expected = div_expr(vec![int(5), int(10)]);
-        let actual = parse(input);
-
-        assert_eq!(actual, expected);
+                assert_eq!(actual, expected);
+            });
     }
 
     #[test]
     fn modulo() {
-        let input = "5 % 10";
+        ["5 % 10", "5 %10", "5% 10", "5%10"]
+            .iter()
+            .for_each(|input| {
+                let expected = mod_expr(vec![int(5), int(10)]);
+                let actual = parse(input);
 
-        let expected = mod_expr(vec![int(5), int(10)]);
-        let actual = parse(input);
-
-        assert_eq!(actual, expected);
+                assert_eq!(actual, expected);
+            });
     }
 
     #[test]
     fn power() {
-        let input = "5 ^ 10";
+        ["5 ^ 10", "5 ^10", "5^ 10", "5^10"]
+            .iter()
+            .for_each(|input| {
+                let expected = pow_expr(vec![int(5), int(10)]);
+                let actual = parse(input);
 
-        let expected = pow_expr(vec![int(5), int(10)]);
-        let actual = parse(input);
+                assert_eq!(actual, expected);
+            });
+    }
 
-        assert_eq!(actual, expected);
+    mod operator_and_sign {
+        use super::*;
+
+        #[test]
+        fn all_operators_with_positive_sign() {
+            [
+                ("5++10", add_expr(vec![int(5), int(10)])),
+                ("5-+10", sub_expr(vec![int(5), int(10)])),
+                ("5*+10", mul_expr(vec![int(5), int(10)])),
+                ("5/+10", div_expr(vec![int(5), int(10)])),
+                ("5%+10", mod_expr(vec![int(5), int(10)])),
+                ("5^+10", pow_expr(vec![int(5), int(10)])),
+            ]
+            .into_iter()
+            .for_each(|(input, expected)| {
+                let actual = parse(input);
+                assert_eq!(actual, expected);
+            });
+        }
+
+        #[test]
+        fn all_operators_with_negative_sign() {
+            [
+                ("5+-10", add_expr(vec![int(5), int(-10)])),
+                ("5--10", sub_expr(vec![int(5), int(-10)])),
+                ("5*-10", mul_expr(vec![int(5), int(-10)])),
+                ("5/-10", div_expr(vec![int(5), int(-10)])),
+                ("5%-10", mod_expr(vec![int(5), int(-10)])),
+                ("5^-10", pow_expr(vec![int(5), int(-10)])),
+            ]
+            .into_iter()
+            .for_each(|(input, expected)| {
+                let actual = parse(input);
+                assert_eq!(actual, expected);
+            });
+        }
+
+        #[test]
+        #[should_panic]
+        fn multiply_as_sign() {
+            let input = "5+*10";
+            parse(input);
+        }
+
+        #[test]
+        #[should_panic]
+        fn divide_as_sign() {
+            let input = "5+/10";
+            parse(input);
+        }
+
+        #[test]
+        #[should_panic]
+        fn modulo_as_sign() {
+            let input = "5+%10";
+            parse(input);
+        }
+
+        #[test]
+        #[should_panic]
+        fn power_as_sign() {
+            let input = "5+^10";
+            parse(input);
+        }
     }
 }
 
