@@ -4,8 +4,11 @@ use crate::errors::{CommonError, CommonResult};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum FunctionName {
+    // Unary
     SquareRoot,
     Factorial,
+    Negate,
+    // Binary
     Max,
     Min,
     Add,
@@ -19,7 +22,7 @@ pub enum FunctionName {
 impl FunctionName {
     pub fn num_arguments(&self) -> usize {
         match self {
-            FunctionName::SquareRoot | FunctionName::Factorial => 1,
+            FunctionName::SquareRoot | FunctionName::Factorial | FunctionName::Negate => 1,
             FunctionName::Max
             | FunctionName::Min
             | FunctionName::Add
@@ -39,6 +42,7 @@ impl FromStr for FunctionName {
         match arg.to_lowercase().as_str() {
             "sqrt" | "squareroot" | "square_root" => Ok(Self::SquareRoot),
             "fact" | "factorial" => Ok(Self::Factorial),
+            "neg" | "negate" => Ok(Self::Negate),
             "min" | "minimum" => Ok(Self::Min),
             "max" | "maximum" => Ok(Self::Max),
             "add" => Ok(Self::Add),
@@ -57,6 +61,7 @@ impl fmt::Display for FunctionName {
         match self {
             FunctionName::SquareRoot => write!(fmt, "sqrt"),
             FunctionName::Factorial => write!(fmt, "factorial"),
+            FunctionName::Negate => write!(fmt, "negate"),
             FunctionName::Max => write!(fmt, "max"),
             FunctionName::Min => write!(fmt, "min"),
             FunctionName::Add => write!(fmt, "add"),

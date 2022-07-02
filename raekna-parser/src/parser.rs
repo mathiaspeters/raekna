@@ -21,129 +21,197 @@ pub fn parse(raw_expr: &'_ str) -> ParserResult<Expression> {
 }
 
 fn convert_token_tree(token_tree: TokenTree, allow_variable_def: bool) -> ParserResult<Expression> {
-    let mut variable = None;
-    let mut operators = Vec::with_capacity(token_tree.num_operators);
-    let mut expressions = vec![];
-
-    for (i, token) in token_tree.tokens.into_iter().enumerate() {
-        let expr = match token {
-            Token::Literal(literal) => {
-                let sn = match literal {
-                    Literal::Integer(i) => LiteralExpr::Integer(i),
-                    Literal::Float(f) => LiteralExpr::Float(f),
-                };
-                Some(Expression::Literal(sn))
-            }
-            Token::Operator(operator) => {
-                operators.push(operator);
-                None
-            }
-            Token::Function(name, args) => {
-                let args = args
-                    .into_iter()
-                    .map(|a| convert_token_tree(a, false))
-                    .collect::<ParserResult<Vec<_>>>()?;
-                let expr = Expression::Function(
-                    FunctionName::from_str(&name)
-                        .map_err(|_| ParserError::UnknownFunctionName(name))?,
-                    args,
-                );
-                Some(expr)
-            }
-            Token::VariableDefinition(name) => {
-                if i != 0 || !allow_variable_def {
-                    return Err(ParserError::InvalidVariableDefinition(name));
-                }
-                variable = Some(name);
-                None
-            }
-            Token::VariableReference(name) => Some(Expression::VariableRef(name)),
-            Token::Nested(nested_tree) => Some(convert_token_tree(nested_tree, false)?),
-        };
-        if let Some(expr) = expr {
-            expressions.push(Some(expr));
-        }
-    }
-    match (expressions.is_empty(), operators.is_empty()) {
-        (true, true) => return Err(ParserError::EmptyExpression),
-        (true, false) => {
-            return Err(ParserError::InvalidExpression {
-                expressions,
-                operators,
-            })
-        }
-        _ => {}
-    }
-    let expr = collapse_expressions(&mut expressions, &mut operators)?;
-    if let Some(name) = variable {
-        Ok(Expression::Variable(name, Box::new(expr)))
-    } else {
-        Ok(expr)
-    }
+    let mut parser = Parser::new(token_tree.num_operators);
+    parser.convert_token_tree(token_tree, allow_variable_def)?;
+    parser.finish()
 }
 
-fn collapse_expressions(
-    exprs: &mut [Option<Expression>],
-    operators: &mut [Operator],
-) -> ParserResult<Expression> {
-    if exprs.len() != operators.len() + 1 {
-        return Err(ParserError::InvalidExpression {
-            expressions: exprs.to_owned(),
-            operators: operators.to_owned(),
-        });
+struct Parser {
+    variable: Option<String>,
+    operators: Vec<Operator>,
+    expressions: Vec<Option<Expression>>,
+    is_sign: bool,
+    should_negate: bool,
+}
+
+impl Parser {
+    fn new(num_operators: usize) -> Self {
+        Self {
+            variable: None,
+            operators: Vec::with_capacity(num_operators),
+            expressions: vec![],
+            is_sign: false,
+            should_negate: false,
+        }
     }
-    if exprs.len() == 1 {
-        let mut res = None;
-        std::mem::swap(&mut exprs[0], &mut res);
-        Ok(res.unwrap())
-    } else {
-        let mut last_operator = (0, operators[0]);
-        for (i, o) in operators.iter().enumerate().skip(1) {
-            match (last_operator.1, o) {
-                (Operator::Power, _)
-                | (
-                    Operator::Multiply | Operator::Divide | Operator::Modulo,
-                    Operator::Multiply
-                    | Operator::Divide
-                    | Operator::Modulo
-                    | Operator::Add
-                    | Operator::Subtract,
-                )
-                | (Operator::Add | Operator::Subtract, Operator::Add | Operator::Subtract) => {
-                    last_operator = (i, *o)
+
+    fn finish(mut self) -> ParserResult<Expression> {
+        Self::collapse_expressions(&mut self.expressions, &mut self.operators, &self.variable)
+    }
+
+    fn convert_token_tree(
+        &mut self,
+        token_tree: TokenTree,
+        allow_variable_def: bool,
+    ) -> ParserResult<()> {
+        for (i, token) in token_tree.tokens.into_iter().enumerate() {
+            let expr = match token {
+                Token::Literal(literal) => {
+                    let sn = match literal {
+                        Literal::Integer(i) => {
+                            LiteralExpr::Integer(i * if self.should_negate { -1 } else { 1 })
+                        }
+                        Literal::Float(f) => {
+                            LiteralExpr::Float(f * if self.should_negate { -1.0 } else { 1.0 })
+                        }
+                    };
+                    self.is_sign = false;
+                    self.should_negate = false;
+                    Some(Expression::Literal(sn))
                 }
-                _ => {}
+                Token::Operator(operator) => {
+                    if self.is_sign {
+                        match operator {
+                            Operator::Add => {}
+                            Operator::Subtract => self.should_negate = true,
+                            Operator::Multiply => return Err(ParserError::InvalidSign('*')),
+                            Operator::Divide => return Err(ParserError::InvalidSign('/')),
+                            Operator::Modulo => return Err(ParserError::InvalidSign('%')),
+                            Operator::Power => return Err(ParserError::InvalidSign('^')),
+                        }
+                        self.is_sign = false;
+                    } else {
+                        self.operators.push(operator);
+                        self.is_sign = true;
+                    }
+                    None
+                }
+                Token::Function(name, args) => {
+                    let args = args
+                        .into_iter()
+                        .map(|a| convert_token_tree(a, false))
+                        .collect::<ParserResult<Vec<_>>>()?;
+                    let expr = Expression::Function(
+                        FunctionName::from_str(&name)
+                            .map_err(|_| ParserError::UnknownFunctionName(name))?,
+                        args,
+                    );
+                    let expr = self.maybe_negate(expr);
+                    self.is_sign = false;
+                    self.should_negate = false;
+                    Some(expr)
+                }
+                Token::VariableDefinition(name) => {
+                    if i != 0 || !allow_variable_def {
+                        return Err(ParserError::InvalidVariableDefinition(name));
+                    }
+                    self.variable = Some(name);
+                    None
+                }
+                Token::VariableReference(name) => Some(Expression::VariableRef(name)),
+                Token::Nested(nested_tree) => Some(convert_token_tree(nested_tree, false)?),
+            };
+            if let Some(expr) = expr {
+                self.expressions.push(Some(expr));
             }
         }
-        let left = if last_operator.0 == 0 {
-            let mut left = None;
-            std::mem::swap(&mut exprs[0], &mut left);
-            left.unwrap()
+        match (self.expressions.is_empty(), self.operators.is_empty()) {
+            (true, true) => Err(ParserError::EmptyExpression),
+            (true, false) => {
+                let mut expressions = vec![];
+                let mut operators = vec![];
+                std::mem::swap(&mut expressions, &mut self.expressions);
+                std::mem::swap(&mut operators, &mut self.operators);
+                Err(ParserError::InvalidExpression {
+                    expressions,
+                    operators,
+                })
+            }
+            _ => Ok(()),
+        }
+    }
+
+    fn collapse_expressions(
+        exprs: &mut [Option<Expression>],
+        operators: &mut [Operator],
+        variable: &Option<String>,
+    ) -> ParserResult<Expression> {
+        let expr = if exprs.len() != operators.len() + 1 {
+            return Err(ParserError::InvalidExpression {
+                expressions: exprs.to_owned(),
+                operators: operators.to_owned(),
+            });
+        } else if exprs.len() == 1 {
+            let mut res = None;
+            std::mem::swap(&mut exprs[0], &mut res);
+            res.unwrap()
         } else {
-            collapse_expressions(
-                &mut exprs[..last_operator.0 + 1],
-                &mut operators[..last_operator.0],
-            )?
+            let mut last_operator = (0, operators[0]);
+            for (i, o) in operators.iter().enumerate().skip(1) {
+                match (last_operator.1, o) {
+                    (Operator::Power, _)
+                    | (
+                        Operator::Multiply | Operator::Divide | Operator::Modulo,
+                        Operator::Multiply
+                        | Operator::Divide
+                        | Operator::Modulo
+                        | Operator::Add
+                        | Operator::Subtract,
+                    )
+                    | (Operator::Add | Operator::Subtract, Operator::Add | Operator::Subtract) => {
+                        last_operator = (i, *o)
+                    }
+                    _ => {}
+                }
+            }
+            let left = if last_operator.0 == 0 {
+                let mut left = None;
+                std::mem::swap(&mut exprs[0], &mut left);
+                left.unwrap()
+            } else {
+                Self::collapse_expressions(
+                    &mut exprs[..last_operator.0 + 1],
+                    &mut operators[..last_operator.0],
+                    variable,
+                )?
+            };
+            let right = if last_operator.0 == operators.len().saturating_sub(1) {
+                let mut left = None;
+                std::mem::swap(&mut exprs[operators.len()], &mut left);
+                left.unwrap()
+            } else {
+                Self::collapse_expressions(
+                    &mut exprs[last_operator.0 + 1..],
+                    &mut operators[last_operator.0 + 1..],
+                    variable,
+                )?
+            };
+            let function_name = match last_operator.1 {
+                Operator::Add => FunctionName::Add,
+                Operator::Subtract => FunctionName::Subtract,
+                Operator::Multiply => FunctionName::Multiply,
+                Operator::Divide => FunctionName::Divide,
+                Operator::Modulo => FunctionName::Modulus,
+                Operator::Power => FunctionName::Power,
+            };
+            Expression::Function(function_name, vec![left, right])
         };
-        let right = if last_operator.0 == operators.len().saturating_sub(1) {
-            let mut left = None;
-            std::mem::swap(&mut exprs[operators.len()], &mut left);
-            left.unwrap()
+        if let Some(name) = variable {
+            Ok(Expression::Variable(name.clone(), Box::new(expr)))
         } else {
-            collapse_expressions(
-                &mut exprs[last_operator.0 + 1..],
-                &mut operators[last_operator.0 + 1..],
-            )?
+            Ok(expr)
+        }
+    }
+
+    fn maybe_negate(&mut self, expr: Expression) -> Expression {
+        let expr = if self.should_negate {
+            Expression::Function(FunctionName::Negate, vec![expr])
+        } else {
+            expr
         };
-        let function_name = match last_operator.1 {
-            Operator::Add => FunctionName::Add,
-            Operator::Subtract => FunctionName::Subtract,
-            Operator::Multiply => FunctionName::Multiply,
-            Operator::Divide => FunctionName::Divide,
-            Operator::Modulo => FunctionName::Modulus,
-            Operator::Power => FunctionName::Power,
-        };
-        Ok(Expression::Function(function_name, vec![left, right]))
+        self.is_sign = false;
+        self.should_negate = false;
+        expr
     }
 }
 

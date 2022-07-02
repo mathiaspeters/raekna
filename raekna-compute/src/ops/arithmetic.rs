@@ -33,6 +33,14 @@ pub fn factorial(value: Literal) -> ComputeResult<Literal> {
     }
 }
 
+pub fn negate(value: Literal) -> ComputeResult<Literal> {
+    let res = match value {
+        Literal::Integer(i) => Literal::Integer(-i),
+        Literal::Float(f) => Literal::Float(-f),
+    };
+    Ok(res)
+}
+
 pub fn add(left: Literal, right: Literal) -> Literal {
     use Literal::*;
     let sum = match (left, right) {
