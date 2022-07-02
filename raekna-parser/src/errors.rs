@@ -12,6 +12,7 @@ pub enum ParserError {
         expressions: Vec<Option<Expression>>,
         operators: Vec<Operator>,
     },
+    InvalidSign(char),
     UnknownFunctionName(String),
     InvalidVariableDefinition(String),
     NomError(nom::Err<Error<()>>),

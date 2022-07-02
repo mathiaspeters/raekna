@@ -48,16 +48,6 @@ mod parse_literals {
 
             assert_eq!(actual, expected);
         }
-
-        #[test]
-        fn negative() {
-            let input = "-1234";
-
-            let expected = int(-1234);
-            let actual = parse(input);
-
-            assert_eq!(actual, expected);
-        }
     }
 
     mod decimals {
@@ -68,16 +58,6 @@ mod parse_literals {
             let input = "11.1";
 
             let expected = float(11.1);
-            let actual = parse(input);
-
-            assert_eq!(actual, expected);
-        }
-
-        #[test]
-        fn negative() {
-            let input = "-98.765";
-
-            let expected = float(-98.765);
             let actual = parse(input);
 
             assert_eq!(actual, expected);
@@ -108,26 +88,6 @@ mod parse_literals {
 
                     assert_eq!(actual, expected);
                 }
-
-                #[test]
-                fn neg_e_pos() {
-                    let input = "-6e5";
-
-                    let expected = int(-600000);
-                    let actual = parse(input);
-
-                    assert_eq!(actual, expected);
-                }
-
-                #[test]
-                fn neg_e_neg() {
-                    let input = "-2e-2";
-
-                    let expected = float(-0.02);
-                    let actual = parse(input);
-
-                    assert_eq!(actual, expected);
-                }
             }
 
             mod decimal_factor {
@@ -148,26 +108,6 @@ mod parse_literals {
                     let input = "7.987123e-3";
 
                     let expected = float(0.007987123);
-                    let actual = parse(input);
-
-                    assert_eq!(actual, expected);
-                }
-
-                #[test]
-                fn neg_e_pos() {
-                    let input = "-2.95e3";
-
-                    let expected = int(-2950);
-                    let actual = parse(input);
-
-                    assert_eq!(actual, expected);
-                }
-
-                #[test]
-                fn neg_e_neg() {
-                    let input = "-123.456e-3";
-
-                    let expected = float(-0.123456);
                     let actual = parse(input);
 
                     assert_eq!(actual, expected);

@@ -101,7 +101,10 @@ mod number_parsers {
         let factor = alt((float, map(integer, |i| i as f64)));
         // Exponent can only be an integer
         let exponent = integer;
-        map_res(recognize(tuple((factor, one_of("eE"), exponent))), to_f64)(input)
+        map_res(
+            recognize(tuple((factor, one_of("eE"), opt(char('-')), exponent))),
+            to_f64,
+        )(input)
     }
 
     /// Parses floating point numbers
@@ -109,15 +112,19 @@ mod number_parsers {
     pub fn float(input: &str) -> IResult<&str, f64> {
         map_res(
             alt((
-                recognize(tuple((opt(char('-')), char('.'), decimal))),
-                recognize(tuple((opt(char('-')), decimal, char('.'), opt(decimal)))),
+                recognize(tuple((char('.'), decimal))),
+                recognize(tuple((
+                    decimal,
+                    char('.'),
+                    opt(tuple((opt(char('-')), decimal))),
+                ))),
             )),
             to_f64,
         )(input)
     }
 
     pub fn integer(input: &str) -> IResult<&str, i64> {
-        map_res(recognize(tuple((opt(char('-')), decimal))), to_i64)(input)
+        map_res(recognize(decimal), to_i64)(input)
     }
 
     fn decimal(input: &str) -> IResult<&str, &str> {
@@ -243,17 +250,6 @@ mod tests {
                 assert!(rem.is_empty());
                 assert_eq!(actual, expected);
             }
-
-            #[test]
-            fn negative() {
-                let input = "-1234";
-
-                let expected = Token::Literal(Literal::Integer(-1234));
-                let (rem, actual) = parse_number(input).unwrap();
-
-                assert!(rem.is_empty());
-                assert_eq!(actual, expected);
-            }
         }
 
         mod decimals {
@@ -275,17 +271,6 @@ mod tests {
                 let input = "11.1";
 
                 let expected = Token::Literal(Literal::Float(11.1));
-                let (rem, actual) = parse_number(input).unwrap();
-
-                assert!(rem.is_empty());
-                assert_eq!(actual, expected);
-            }
-
-            #[test]
-            fn negative() {
-                let input = "-98.765";
-
-                let expected = Token::Literal(Literal::Float(-98.765));
                 let (rem, actual) = parse_number(input).unwrap();
 
                 assert!(rem.is_empty());
@@ -319,28 +304,6 @@ mod tests {
                         assert!(rem.is_empty());
                         assert_eq!(actual, expected);
                     }
-
-                    #[test]
-                    fn neg_e_pos() {
-                        let input = "-6e7";
-
-                        let expected = Token::Literal(Literal::Integer(-60000000));
-                        let (rem, actual) = parse_number(input).unwrap();
-
-                        assert!(rem.is_empty());
-                        assert_eq!(actual, expected);
-                    }
-
-                    #[test]
-                    fn neg_e_neg() {
-                        let input = "-2e-3";
-
-                        let expected = Token::Literal(Literal::Float(-0.002));
-                        let (rem, actual) = parse_number(input).unwrap();
-
-                        assert!(rem.is_empty());
-                        assert_eq!(actual, expected);
-                    }
                 }
 
                 mod decimal_factor {
@@ -362,28 +325,6 @@ mod tests {
                         let input = "7.987123e-5";
 
                         let expected = Token::Literal(Literal::Float(0.00007987123));
-                        let (rem, actual) = parse_number(input).unwrap();
-
-                        assert!(rem.is_empty());
-                        assert_eq!(actual, expected);
-                    }
-
-                    #[test]
-                    fn neg_e_pos() {
-                        let input = "-2.95e5";
-
-                        let expected = Token::Literal(Literal::Integer(-295000));
-                        let (rem, actual) = parse_number(input).unwrap();
-
-                        assert!(rem.is_empty());
-                        assert_eq!(actual, expected);
-                    }
-
-                    #[test]
-                    fn neg_e_neg() {
-                        let input = "-123.456e-3";
-
-                        let expected = Token::Literal(Literal::Float(-0.123456));
                         let (rem, actual) = parse_number(input).unwrap();
 
                         assert!(rem.is_empty());
