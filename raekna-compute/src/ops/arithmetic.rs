@@ -35,8 +35,8 @@ pub fn factorial(value: Literal) -> ComputeResult<Literal> {
 
 pub fn negate(value: Literal) -> ComputeResult<Literal> {
     let res = match value {
-        Literal::Integer(i) => Literal::Integer(i * -1),
-        Literal::Float(f) => Literal::Float(f * -1.0),
+        Literal::Integer(i) => Literal::Integer(-i),
+        Literal::Float(f) => Literal::Float(-f),
     };
     Ok(res)
 }

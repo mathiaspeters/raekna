@@ -116,16 +116,16 @@ impl Parser {
             }
         }
         match (self.expressions.is_empty(), self.operators.is_empty()) {
-            (true, true) => return Err(ParserError::EmptyExpression),
+            (true, true) => Err(ParserError::EmptyExpression),
             (true, false) => {
                 let mut expressions = vec![];
                 let mut operators = vec![];
                 std::mem::swap(&mut expressions, &mut self.expressions);
                 std::mem::swap(&mut operators, &mut self.operators);
-                return Err(ParserError::InvalidExpression {
+                Err(ParserError::InvalidExpression {
                     expressions,
                     operators,
-                });
+                })
             }
             _ => Ok(()),
         }
