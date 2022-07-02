@@ -17,6 +17,7 @@ pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<L
         // Arithmetic
         FunctionName::SquareRoot => arithmetic::sqrt(args[0]),
         FunctionName::Factorial => arithmetic::factorial(args[0]),
+        FunctionName::Negate => arithmetic::negate(args[0]),
         FunctionName::Add => Ok(arithmetic::add(args[0], args[1])),
         FunctionName::Subtract => Ok(arithmetic::sub(args[0], args[1])),
         FunctionName::Multiply => Ok(arithmetic::mul(args[0], args[1])),
