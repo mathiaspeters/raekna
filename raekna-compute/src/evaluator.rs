@@ -14,9 +14,7 @@ pub fn evaluate(
     match expression {
         Expression::Variable(name, expr) => {
             let res = evaluate_to_literal(&expr, variables)?;
-            if variables.insert(name.clone(), res).is_some() {
-                return Err(ComputeError::DuplicateVariable(name));
-            }
+            variables.insert(name.clone(), res);
             Ok(res)
         }
         expr => {

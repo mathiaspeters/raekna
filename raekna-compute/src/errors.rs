@@ -4,7 +4,6 @@ pub type ComputeResult<T> = Result<T, ComputeError>;
 
 #[derive(Debug)]
 pub enum ComputeError {
-    DuplicateVariable(String),
     UnknownVariable(String),
     FunctionArgumentCount {
         function_name: String,
