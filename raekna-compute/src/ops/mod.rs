@@ -4,6 +4,7 @@ use crate::errors::{ComputeError, ComputeResult};
 
 mod arithmetic;
 mod comparisons;
+mod trigonometry;
 
 pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<Literal> {
     if args.len() != fn_name.num_arguments() {
@@ -24,6 +25,20 @@ pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<L
         FunctionName::Divide => Ok(arithmetic::div(args[0], args[1])),
         FunctionName::Modulus => Ok(arithmetic::mod0(args[0], args[1])),
         FunctionName::Power => arithmetic::pow(args[0], args[1]),
+
+        // Trigonometry
+        FunctionName::Sin => Ok(trigonometry::sin(args[0])),
+        FunctionName::Cos => Ok(trigonometry::cos(args[0])),
+        FunctionName::Tan => Ok(trigonometry::tan(args[0])),
+        FunctionName::SinH => Ok(trigonometry::sinh(args[0])),
+        FunctionName::CosH => Ok(trigonometry::cosh(args[0])),
+        FunctionName::TanH => Ok(trigonometry::tanh(args[0])),
+        FunctionName::ArcSin => Ok(trigonometry::asin(args[0])),
+        FunctionName::ArcCos => Ok(trigonometry::acos(args[0])),
+        FunctionName::ArcTan => Ok(trigonometry::atan(args[0])),
+        FunctionName::ArcSinH => Ok(trigonometry::asinh(args[0])),
+        FunctionName::ArcCosH => Ok(trigonometry::acosh(args[0])),
+        FunctionName::ArcTanH => Ok(trigonometry::atanh(args[0])),
 
         // Comparisons
         FunctionName::Max => Ok(comparisons::max(args[0], args[1])),

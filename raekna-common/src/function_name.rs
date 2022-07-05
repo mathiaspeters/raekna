@@ -17,20 +17,47 @@ pub enum FunctionName {
     Divide,
     Modulus,
     Power,
+    // Trigonometric
+    Sin,
+    Cos,
+    Tan,
+    SinH,
+    CosH,
+    TanH,
+    ArcSin,
+    ArcCos,
+    ArcTan,
+    ArcSinH,
+    ArcCosH,
+    ArcTanH,
 }
 
 impl FunctionName {
     pub fn num_arguments(&self) -> usize {
         match self {
-            FunctionName::SquareRoot | FunctionName::Factorial | FunctionName::Negate => 1,
-            FunctionName::Max
-            | FunctionName::Min
-            | FunctionName::Add
-            | FunctionName::Subtract
-            | FunctionName::Multiply
-            | FunctionName::Divide
-            | FunctionName::Modulus
-            | FunctionName::Power => 2,
+            Self::SquareRoot
+            | Self::Factorial
+            | Self::Negate
+            | Self::Sin
+            | Self::Cos
+            | Self::Tan
+            | Self::SinH
+            | Self::CosH
+            | Self::TanH
+            | Self::ArcSin
+            | Self::ArcCos
+            | Self::ArcTan
+            | Self::ArcSinH
+            | Self::ArcCosH
+            | Self::ArcTanH => 1,
+            Self::Max
+            | Self::Min
+            | Self::Add
+            | Self::Subtract
+            | Self::Multiply
+            | Self::Divide
+            | Self::Modulus
+            | Self::Power => 2,
         }
     }
 }
@@ -51,6 +78,18 @@ impl FromStr for FunctionName {
             "div" | "divide" => Ok(Self::Divide),
             "mod" | "modulus" => Ok(Self::Modulus),
             "pow" | "power" => Ok(Self::Power),
+            "sin" => Ok(Self::Sin),
+            "cos" => Ok(Self::Cos),
+            "tan" => Ok(Self::Tan),
+            "sinh" => Ok(Self::SinH),
+            "cosh" => Ok(Self::CosH),
+            "tanh" => Ok(Self::TanH),
+            "asin" | "arcsin" => Ok(Self::ArcSin),
+            "acos" | "arccos" => Ok(Self::ArcCos),
+            "atan" | "arctan" => Ok(Self::ArcTan),
+            "asinh" | "arcsinh" => Ok(Self::ArcSinH),
+            "acosh" | "arccosh" => Ok(Self::ArcCosH),
+            "atanh" | "arctanh" => Ok(Self::ArcTanH),
             _ => Err(CommonError::UnknownFunctionName(arg.to_owned())),
         }
     }
@@ -59,17 +98,29 @@ impl FromStr for FunctionName {
 impl fmt::Display for FunctionName {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
         match self {
-            FunctionName::SquareRoot => write!(fmt, "sqrt"),
-            FunctionName::Factorial => write!(fmt, "factorial"),
-            FunctionName::Negate => write!(fmt, "negate"),
-            FunctionName::Max => write!(fmt, "max"),
-            FunctionName::Min => write!(fmt, "min"),
-            FunctionName::Add => write!(fmt, "add"),
-            FunctionName::Subtract => write!(fmt, "sub"),
-            FunctionName::Multiply => write!(fmt, "mul"),
-            FunctionName::Divide => write!(fmt, "div"),
-            FunctionName::Modulus => write!(fmt, "mod"),
-            FunctionName::Power => write!(fmt, "pow"),
+            Self::SquareRoot => write!(fmt, "sqrt"),
+            Self::Factorial => write!(fmt, "factorial"),
+            Self::Negate => write!(fmt, "negate"),
+            Self::Max => write!(fmt, "max"),
+            Self::Min => write!(fmt, "min"),
+            Self::Add => write!(fmt, "add"),
+            Self::Subtract => write!(fmt, "sub"),
+            Self::Multiply => write!(fmt, "mul"),
+            Self::Divide => write!(fmt, "div"),
+            Self::Modulus => write!(fmt, "mod"),
+            Self::Power => write!(fmt, "pow"),
+            Self::Sin => write!(fmt, "sin"),
+            Self::Cos => write!(fmt, "cos"),
+            Self::Tan => write!(fmt, "tan"),
+            Self::SinH => write!(fmt, "sinh"),
+            Self::CosH => write!(fmt, "cosh"),
+            Self::TanH => write!(fmt, "tanh"),
+            Self::ArcSin => write!(fmt, "asin"),
+            Self::ArcCos => write!(fmt, "acos"),
+            Self::ArcTan => write!(fmt, "atan"),
+            Self::ArcSinH => write!(fmt, "asinh"),
+            Self::ArcCosH => write!(fmt, "acosh"),
+            Self::ArcTanH => write!(fmt, "atanh"),
         }
     }
 }
