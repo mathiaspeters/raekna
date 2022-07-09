@@ -12,6 +12,7 @@ pub enum ComputeError {
     },
     InvalidFactorialArgument(Literal),
     InvalidSquareRoot(Literal),
+    InvalidCubeRoot(Literal),
     InvalidPower {
         factor: Literal,
         exponent: Literal,

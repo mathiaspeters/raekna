@@ -1,5 +1,3 @@
-use std::fmt;
-
 use crate::function_name::FunctionName;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -49,22 +47,4 @@ pub enum Expression {
     Variable(String, Box<Expression>),
     VariableRef(String),
     Function(FunctionName, Vec<Expression>),
-}
-
-impl fmt::Display for Expression {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Expression::Literal(literal) => write!(f, "{literal}"),
-            Expression::Variable(name, expr) => write!(f, "{name}: {expr}"),
-            Expression::VariableRef(name) => write!(f, "{name}"),
-            Expression::Function(function_name, arguments) => {
-                let args = arguments
-                    .iter()
-                    .map(|e| e.to_string())
-                    .collect::<Vec<_>>()
-                    .join(", ");
-                write!(f, "{function_name}({args})",)
-            }
-        }
-    }
 }

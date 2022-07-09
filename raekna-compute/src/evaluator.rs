@@ -14,7 +14,7 @@ pub fn evaluate(
     match expression {
         Expression::Variable(name, expr) => {
             let res = evaluate_to_literal(&expr, variables)?;
-            variables.insert(name.clone(), res);
+            variables.insert(name, res);
             Ok(res)
         }
         expr => {

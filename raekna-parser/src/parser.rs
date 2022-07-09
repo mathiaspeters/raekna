@@ -91,11 +91,18 @@ impl Parser {
                         .into_iter()
                         .map(|a| convert_token_tree(a, false))
                         .collect::<ParserResult<Vec<_>>>()?;
-                    let expr = Expression::Function(
-                        FunctionName::from_str(&name)
-                            .map_err(|_| ParserError::UnknownFunctionName(name))?,
-                        args,
-                    );
+                    let function = {
+                        use FunctionName::*;
+                        let function = FunctionName::from_str(&name)
+                            .map_err(|_| ParserError::UnknownFunctionName(name))?;
+                        match function {
+                            Ceil if args.len() == 2 => CeilPrec,
+                            Floor if args.len() == 2 => FloorPrec,
+                            Round if args.len() == 2 => RoundPrec,
+                            _ => function,
+                        }
+                    };
+                    let expr = Expression::Function(function, args);
                     let expr = self.maybe_negate(expr);
                     self.is_sign = false;
                     self.should_negate = false;

@@ -4,20 +4,15 @@ use crate::errors::{CommonError, CommonResult};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum FunctionName {
-    // Unary
-    SquareRoot,
-    Factorial,
-    Negate,
-    // Binary
-    Max,
-    Min,
+    // Arithmetic
     Add,
     Subtract,
     Multiply,
     Divide,
     Modulus,
     Power,
-    // Trigonometric
+    Negate,
+    // Trigonometry
     Sin,
     Cos,
     Tan,
@@ -30,12 +25,42 @@ pub enum FunctionName {
     ArcSinH,
     ArcCosH,
     ArcTanH,
+    // Misc math
+    SquareRoot,
+    CubeRoot,
+    Factorial,
+    Log,
+    Log2,
+    Log10,
+    Ln,
+    Abs,
+    // Rounding
+    Ceil,
+    CeilPrec,
+    Floor,
+    FloorPrec,
+    Round,
+    RoundPrec,
+    Trunc,
+    TruncPrec,
+    // Comparisons
+    Max,
+    Min,
 }
 
 impl FunctionName {
     pub fn num_arguments(&self) -> usize {
         match self {
             Self::SquareRoot
+            | Self::CubeRoot
+            | Self::Log2
+            | Self::Log10
+            | Self::Ln
+            | Self::Abs
+            | Self::Ceil
+            | Self::Floor
+            | Self::Round
+            | Self::Trunc
             | Self::Factorial
             | Self::Negate
             | Self::Sin
@@ -57,7 +82,12 @@ impl FunctionName {
             | Self::Multiply
             | Self::Divide
             | Self::Modulus
-            | Self::Power => 2,
+            | Self::Power
+            | Self::Log
+            | Self::CeilPrec
+            | Self::FloorPrec
+            | Self::RoundPrec
+            | Self::TruncPrec => 2,
         }
     }
 }
@@ -90,6 +120,16 @@ impl FromStr for FunctionName {
             "asinh" | "arcsinh" => Ok(Self::ArcSinH),
             "acosh" | "arccosh" => Ok(Self::ArcCosH),
             "atanh" | "arctanh" => Ok(Self::ArcTanH),
+            "cbrt" | "cuberoot" | "cube_root" => Ok(Self::CubeRoot),
+            "log" => Ok(Self::Log),
+            "log2" => Ok(Self::Log2),
+            "log10" => Ok(Self::Log10),
+            "ln" => Ok(Self::Ln),
+            "abs" => Ok(Self::Abs),
+            "ceil" => Ok(Self::Ceil),
+            "floor" => Ok(Self::Floor),
+            "round" => Ok(Self::Round),
+            "trunc" => Ok(Self::Trunc),
             _ => Err(CommonError::UnknownFunctionName(arg.to_owned())),
         }
     }
@@ -99,6 +139,7 @@ impl fmt::Display for FunctionName {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
         match self {
             Self::SquareRoot => write!(fmt, "sqrt"),
+            Self::CubeRoot => write!(fmt, "cbrt"),
             Self::Factorial => write!(fmt, "factorial"),
             Self::Negate => write!(fmt, "negate"),
             Self::Max => write!(fmt, "max"),
@@ -121,6 +162,19 @@ impl fmt::Display for FunctionName {
             Self::ArcSinH => write!(fmt, "asinh"),
             Self::ArcCosH => write!(fmt, "acosh"),
             Self::ArcTanH => write!(fmt, "atanh"),
+            Self::Log => write!(fmt, "log"),
+            Self::Log2 => write!(fmt, "log2"),
+            Self::Log10 => write!(fmt, "log10"),
+            Self::Ln => write!(fmt, "ln"),
+            Self::Abs => write!(fmt, "abs"),
+            Self::Ceil => write!(fmt, "ceil"),
+            Self::Floor => write!(fmt, "floor"),
+            Self::Round => write!(fmt, "round"),
+            Self::CeilPrec => write!(fmt, "ceil with precision"),
+            Self::FloorPrec => write!(fmt, "floor with precision"),
+            Self::RoundPrec => write!(fmt, "round with precision"),
+            Self::Trunc => write!(fmt, "trunc"),
+            Self::TruncPrec => write!(fmt, "trunc with precision"),
         }
     }
 }

@@ -4,6 +4,8 @@ use crate::errors::{ComputeError, ComputeResult};
 
 mod arithmetic;
 mod comparisons;
+mod misc_math;
+mod rounding;
 mod trigonometry;
 
 pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<Literal> {
@@ -16,8 +18,6 @@ pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<L
     }
     match fn_name {
         // Arithmetic
-        FunctionName::SquareRoot => arithmetic::sqrt(args[0]),
-        FunctionName::Factorial => arithmetic::factorial(args[0]),
         FunctionName::Negate => arithmetic::negate(args[0]),
         FunctionName::Add => Ok(arithmetic::add(args[0], args[1])),
         FunctionName::Subtract => Ok(arithmetic::sub(args[0], args[1])),
@@ -39,6 +39,26 @@ pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<L
         FunctionName::ArcSinH => Ok(trigonometry::asinh(args[0])),
         FunctionName::ArcCosH => Ok(trigonometry::acosh(args[0])),
         FunctionName::ArcTanH => Ok(trigonometry::atanh(args[0])),
+
+        // Misc math
+        FunctionName::SquareRoot => misc_math::sqrt(args[0]),
+        FunctionName::CubeRoot => misc_math::cbrt(args[0]),
+        FunctionName::Factorial => misc_math::factorial(args[0]),
+        FunctionName::Log => Ok(misc_math::log(args[0], args[1])),
+        FunctionName::Log2 => Ok(misc_math::log2(args[0])),
+        FunctionName::Log10 => Ok(misc_math::log10(args[0])),
+        FunctionName::Ln => Ok(misc_math::ln(args[0])),
+        FunctionName::Abs => Ok(misc_math::abs(args[0])),
+
+        // Rounding
+        FunctionName::Ceil => Ok(rounding::ceil(args[0])),
+        FunctionName::CeilPrec => Ok(rounding::ceilprec(args[0], args[1])),
+        FunctionName::Floor => Ok(rounding::floor(args[0])),
+        FunctionName::FloorPrec => Ok(rounding::floorprec(args[0], args[1])),
+        FunctionName::Round => Ok(rounding::round(args[0])),
+        FunctionName::RoundPrec => Ok(rounding::roundprec(args[0], args[1])),
+        FunctionName::Trunc => Ok(rounding::trunc(args[0])),
+        FunctionName::TruncPrec => Ok(rounding::truncprec(args[0], args[1])),
 
         // Comparisons
         FunctionName::Max => Ok(comparisons::max(args[0], args[1])),
