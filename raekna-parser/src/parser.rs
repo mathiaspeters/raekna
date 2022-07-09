@@ -40,7 +40,7 @@ impl Parser {
             variable: None,
             operators: Vec::with_capacity(num_operators),
             expressions: vec![],
-            is_sign: false,
+            is_sign: true,
             should_negate: false,
         }
     }
@@ -380,6 +380,59 @@ mod tests {
                     ),
                 ],
             )),
+        );
+        let actual = convert_token_tree(tt, true).unwrap();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn negative_number() {
+        let tt = TokenTree {
+            num_operators: 1,
+            tokens: vec![
+                Token::Operator(Operator::Subtract),
+                Token::Literal(Literal::Integer(2)),
+            ],
+        };
+
+        let expected = Expression::Literal(LiteralExpr::Integer(-2));
+        let actual = convert_token_tree(tt, true).unwrap();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn function_with_negative_arguments() {
+        let tt = TokenTree {
+            num_operators: 0,
+            tokens: vec![Token::Function(
+                "add".to_owned(),
+                vec![
+                    TokenTree {
+                        num_operators: 1,
+                        tokens: vec![
+                            Token::Operator(Operator::Subtract),
+                            Token::Literal(Literal::Integer(1)),
+                        ],
+                    },
+                    TokenTree {
+                        num_operators: 1,
+                        tokens: vec![
+                            Token::Operator(Operator::Subtract),
+                            Token::Literal(Literal::Integer(2)),
+                        ],
+                    },
+                ],
+            )],
+        };
+
+        let expected = Expression::Function(
+            FunctionName::Add,
+            vec![
+                Expression::Literal(LiteralExpr::Integer(-1)),
+                Expression::Literal(LiteralExpr::Integer(-2)),
+            ],
         );
         let actual = convert_token_tree(tt, true).unwrap();
 

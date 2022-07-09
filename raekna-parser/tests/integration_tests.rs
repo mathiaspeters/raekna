@@ -431,6 +431,16 @@ mod order_of_operations {
 
         assert_eq!(actual, expected);
     }
+
+    #[test]
+    fn function_with_negative_arguments() {
+        let input = "add(-1, -2)";
+
+        let expected = add_expr(vec![int(-1), int(-2)]);
+        let actual = parse(input);
+
+        assert_eq!(actual, expected);
+    }
 }
 
 mod functions {
