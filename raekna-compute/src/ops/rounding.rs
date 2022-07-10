@@ -13,8 +13,13 @@ where
         Literal::Integer(_) => value,
         Literal::Float(f) => {
             let result = match precision {
-                Some(Literal::Float(_stepping)) => {
-                    todo!()
+                Some(Literal::Float(stepping)) => {
+                    let precision = stepping.to_string().len();
+                    let precision = 10_u32.pow(precision as u32) as f64;
+                    let result = f / stepping;
+                    let result = (result * precision).round() / precision;
+                    let result = op(result);
+                    result * stepping
                 }
                 Some(Literal::Integer(precision)) => {
                     let multiplier = 10_i64.pow(precision as u32) as f64;
