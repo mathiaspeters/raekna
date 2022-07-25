@@ -2,7 +2,7 @@ use raekna_common::expression::Literal;
 
 pub type ComputeResult<T> = Result<T, ComputeError>;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ComputeError {
     UnknownVariable(String),
     FunctionArgumentCount {
@@ -17,4 +17,10 @@ pub enum ComputeError {
         factor: Literal,
         exponent: Literal,
     },
+    InvalidTruncatePrecision(Literal),
+    InvalidLogarithm {
+        value: Literal,
+        base: Literal,
+    },
+    InvalidNaturalLogarithm(Literal),
 }

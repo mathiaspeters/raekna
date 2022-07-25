@@ -50,6 +50,7 @@ pub fn mul(left: Literal, right: Literal) -> Literal {
     Literal::from(product)
 }
 
+// TODO: division by 0
 pub fn div(left: Literal, right: Literal) -> Literal {
     use Literal::*;
     let quotient = match (left, right) {

@@ -44,10 +44,10 @@ pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<L
         FunctionName::SquareRoot => misc_math::sqrt(args[0]),
         FunctionName::CubeRoot => misc_math::cbrt(args[0]),
         FunctionName::Factorial => misc_math::factorial(args[0]),
-        FunctionName::Log => Ok(misc_math::log(args[0], args[1])),
-        FunctionName::Log2 => Ok(misc_math::log2(args[0])),
-        FunctionName::Log10 => Ok(misc_math::log10(args[0])),
-        FunctionName::Ln => Ok(misc_math::ln(args[0])),
+        FunctionName::Log => misc_math::log(args[0], args[1]),
+        FunctionName::Log2 => misc_math::log2(args[0]),
+        FunctionName::Log10 => misc_math::log10(args[0]),
+        FunctionName::Ln => misc_math::ln(args[0]),
         FunctionName::Abs => Ok(misc_math::abs(args[0])),
 
         // Rounding
@@ -58,7 +58,7 @@ pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<L
         FunctionName::Round => Ok(rounding::round(args[0])),
         FunctionName::RoundPrec => Ok(rounding::roundprec(args[0], args[1])),
         FunctionName::Trunc => Ok(rounding::trunc(args[0])),
-        FunctionName::TruncPrec => Ok(rounding::truncprec(args[0], args[1])),
+        FunctionName::TruncPrec => rounding::truncprec(args[0], args[1]),
 
         // Comparisons
         FunctionName::Max => Ok(comparisons::max(args[0], args[1])),
