@@ -6,10 +6,7 @@ fn process<F>(value: Literal, precision: Option<Literal>, op: F) -> Option<Liter
 where
     F: Fn(f64) -> f64,
 {
-    let value = match value {
-        Literal::Integer(i) => i as f64,
-        Literal::Float(f) => f,
-    };
+    let value = value.as_f64();
     let result = match precision {
         Some(Literal::Float(stepping)) => {
             let precision = stepping.to_string().len();
