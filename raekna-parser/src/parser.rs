@@ -59,10 +59,10 @@ impl Parser {
                 Token::Literal(literal) => {
                     let sn = match literal {
                         Literal::Integer(i) => {
-                            LiteralExpr::Integer(i * if self.should_negate { -1 } else { 1 })
+                            LiteralExpr::Integer(if self.should_negate { -i } else { i })
                         }
                         Literal::Float(f) => {
-                            LiteralExpr::Float(f * if self.should_negate { -1.0 } else { 1.0 })
+                            LiteralExpr::Float(if self.should_negate { -f } else { f })
                         }
                     };
                     self.is_sign = false;
@@ -115,8 +115,20 @@ impl Parser {
                     self.variable = Some(name);
                     None
                 }
-                Token::VariableReference(name) => Some(Expression::VariableRef(name)),
-                Token::Nested(nested_tree) => Some(convert_token_tree(nested_tree, false)?),
+                Token::VariableReference(name) => {
+                    let expr = Expression::VariableRef(name);
+                    let expr = self.maybe_negate(expr);
+                    self.is_sign = false;
+                    self.should_negate = false;
+                    Some(expr)
+                }
+                Token::Nested(nested_tree) => {
+                    let expr = convert_token_tree(nested_tree, false)?;
+                    let expr = self.maybe_negate(expr);
+                    self.is_sign = false;
+                    self.should_negate = false;
+                    Some(expr)
+                }
             };
             if let Some(expr) = expr {
                 self.expressions.push(Some(expr));

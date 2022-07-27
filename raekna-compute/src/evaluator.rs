@@ -38,7 +38,7 @@ fn evaluate_to_literal(
             let value = constants::evaluate(var_name).map(Ok).unwrap_or_else(|| {
                 variables
                     .get(var_name.as_str())
-                    .map(|lit| *lit)
+                    .copied()
                     .ok_or_else(|| ComputeError::UnknownVariable(var_name.clone()))
             })?;
             Ok(value)

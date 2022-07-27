@@ -1,8 +1,7 @@
 use raekna_common::expression::Literal;
 
-use crate::errors::{ComputeError, ComputeResult};
-
 use super::validate_and_wrap;
+use crate::errors::{ComputeError, ComputeResult};
 
 pub fn sqrt(value: Literal) -> ComputeResult<Option<Literal>> {
     let raw = match value {
@@ -97,9 +96,10 @@ pub fn abs(value: Literal) -> Option<Literal> {
 
 #[cfg(test)]
 mod tests {
+    use proptest::prelude::*;
+
     use super::*;
     use crate::ops::test_utils::{float, int};
-    use proptest::prelude::*;
 
     mod test_sqrt {
         use super::*;

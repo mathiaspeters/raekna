@@ -42,12 +42,10 @@ impl From<f64> for Literal {
     fn from(value: f64) -> Self {
         if value > i64::MAX as f64 {
             Self::Float(value)
+        } else if value.fract().abs() < f64::EPSILON {
+            Self::Integer(value as i64)
         } else {
-            if value.fract().abs() < f64::EPSILON {
-                Self::Integer(value as i64)
-            } else {
-                Self::Float(value)
-            }
+            Self::Float(value)
         }
     }
 }

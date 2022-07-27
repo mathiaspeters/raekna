@@ -61,8 +61,9 @@ pub fn atanh(value: Literal) -> Option<Literal> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use proptest::prelude::*;
+
+    use super::*;
 
     mod test_sin {
         use super::*;
