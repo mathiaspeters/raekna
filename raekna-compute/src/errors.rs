@@ -1,4 +1,4 @@
-use raekna_common::expression::Literal;
+use raekna_common::{expression::Literal, function_name::FunctionName};
 
 pub type ComputeResult<T> = Result<T, ComputeError>;
 
@@ -10,17 +10,9 @@ pub enum ComputeError {
         expected_argument_count: usize,
         supplied_argument_count: usize,
     },
+    ResultTooBig(FunctionName, Vec<Literal>),
     InvalidFactorialArgument(Literal),
     InvalidSquareRoot(Literal),
-    InvalidCubeRoot(Literal),
-    InvalidPower {
-        factor: Literal,
-        exponent: Literal,
-    },
+    DivisionByZero,
     InvalidTruncatePrecision(Literal),
-    InvalidLogarithm {
-        value: Literal,
-        base: Literal,
-    },
-    InvalidNaturalLogarithm(Literal),
 }

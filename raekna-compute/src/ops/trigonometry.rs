@@ -1,68 +1,72 @@
 use raekna_common::expression::Literal;
 
-fn trig<F>(value: Literal, op: F) -> Literal
+use crate::ops::validate_and_wrap;
+
+fn trig<F>(value: Literal, op: F) -> Option<Literal>
 where
     F: Fn(f64) -> f64,
 {
     use Literal::*;
-    let value = match value {
+    let result = match value {
         Integer(i) => i as f64,
         Float(f) => f,
     };
-    Literal::from(op(value))
+    let result = op(result);
+    validate_and_wrap(result)
 }
 
-pub fn sin(value: Literal) -> Literal {
+pub fn sin(value: Literal) -> Option<Literal> {
     trig(value, f64::sin)
 }
 
-pub fn cos(value: Literal) -> Literal {
+pub fn cos(value: Literal) -> Option<Literal> {
     trig(value, f64::cos)
 }
 
-pub fn tan(value: Literal) -> Literal {
+pub fn tan(value: Literal) -> Option<Literal> {
     trig(value, f64::tan)
 }
 
-pub fn sinh(value: Literal) -> Literal {
+pub fn sinh(value: Literal) -> Option<Literal> {
     trig(value, f64::sinh)
 }
 
-pub fn cosh(value: Literal) -> Literal {
+pub fn cosh(value: Literal) -> Option<Literal> {
     trig(value, f64::cosh)
 }
 
-pub fn tanh(value: Literal) -> Literal {
+pub fn tanh(value: Literal) -> Option<Literal> {
     trig(value, f64::tanh)
 }
 
-pub fn asin(value: Literal) -> Literal {
+pub fn asin(value: Literal) -> Option<Literal> {
     trig(value, f64::asin)
 }
 
-pub fn acos(value: Literal) -> Literal {
+pub fn acos(value: Literal) -> Option<Literal> {
     trig(value, f64::acos)
 }
 
-pub fn atan(value: Literal) -> Literal {
+pub fn atan(value: Literal) -> Option<Literal> {
     trig(value, f64::atan)
 }
 
-pub fn asinh(value: Literal) -> Literal {
+pub fn asinh(value: Literal) -> Option<Literal> {
     trig(value, f64::asinh)
 }
 
-pub fn acosh(value: Literal) -> Literal {
+pub fn acosh(value: Literal) -> Option<Literal> {
     trig(value, f64::acosh)
 }
 
-pub fn atanh(value: Literal) -> Literal {
+pub fn atanh(value: Literal) -> Option<Literal> {
     trig(value, f64::atanh)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
 
     const TEST_CASES: [Literal; 6] = [
         Literal::Float(-0.2),
@@ -76,7 +80,7 @@ mod tests {
     fn trig_test<F1, F2>(test_cases: &[Literal], exp: F1, act: F2)
     where
         F1: Fn(f64) -> f64,
-        F2: Fn(Literal) -> Literal,
+        F2: Fn(Literal) -> Option<Literal>,
     {
         test_cases.into_iter().for_each(|value| {
             let value = *value;
@@ -86,25 +90,139 @@ mod tests {
             };
             let expected = Literal::from(expected);
 
-            let actual = act(value);
+            let actual = act(value).unwrap();
 
             assert_eq!(actual, expected);
         });
     }
 
-    #[test]
-    fn test_sin() {
-        trig_test(&TEST_CASES, f64::sin, sin);
+    mod test_sin {
+        use super::*;
+
+        #[test]
+        fn positive_cases() {
+            trig_test(&TEST_CASES, f64::sin, sin);
+        }
+
+        proptest! {
+            #[test]
+            fn proptest_f64(value: f64) {
+                let expected_raw = value.sin();
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Float(value);
+                let actual = sin(value);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    assert!(actual.is_none());
+                }
+            }
+
+            #[test]
+            fn proptest_i64(value: i64) {
+                let expected_raw = (value as f64).sin();
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Integer(value);
+                let actual = sin(value);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    assert!(actual.is_none());
+                }
+            }
+        }
     }
 
-    #[test]
-    fn test_cos() {
-        trig_test(&TEST_CASES, f64::cos, cos);
+    mod test_cos {
+        use super::*;
+
+        #[test]
+        fn positive_cases() {
+            trig_test(&TEST_CASES, f64::cos, cos);
+        }
+
+        proptest! {
+            #[test]
+            fn proptest_f64(value: f64) {
+                let expected_raw = value.cos();
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Float(value);
+                let actual = cos(value);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    assert!(actual.is_none());
+                }
+            }
+
+            #[test]
+            fn proptest_i64(value: i64) {
+                let expected_raw = (value as f64).cos();
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Integer(value);
+                let actual = cos(value);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    assert!(actual.is_none());
+                }
+            }
+        }
     }
 
-    #[test]
-    fn test_tan() {
-        trig_test(&TEST_CASES, f64::tan, tan);
+    mod test_tan {
+        use super::*;
+
+        #[test]
+        fn positive_cases() {
+            trig_test(&TEST_CASES, f64::tan, tan);
+        }
+
+        proptest! {
+            #[test]
+            fn proptest_f64(value: f64) {
+                let expected_raw = value.tan();
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Float(value);
+                let actual = tan(value);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    assert!(actual.is_none());
+                }
+            }
+
+            #[test]
+            fn proptest_i64(value: i64) {
+                let expected_raw = (value as f64).tan();
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Integer(value);
+                let actual = tan(value);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    assert!(actual.is_none());
+                }
+            }
+        }
     }
 
     #[test]

@@ -2,7 +2,7 @@ use raekna_common::expression::Literal;
 
 use crate::{errors::ComputeResult, ComputeError};
 
-fn process<F>(value: Literal, precision: Option<Literal>, op: F) -> Literal
+fn process<F>(value: Literal, precision: Option<Literal>, op: F) -> Option<Literal>
 where
     F: Fn(f64) -> f64,
 {
@@ -27,38 +27,38 @@ where
         }
         None => op(value),
     };
-    Literal::from(result)
+    Some(Literal::from(result))
 }
 
-pub fn ceil(value: Literal) -> Literal {
+pub fn ceil(value: Literal) -> Option<Literal> {
     process(value, None, f64::ceil)
 }
 
-pub fn ceilprec(value: Literal, precision: Literal) -> Literal {
+pub fn ceilprec(value: Literal, precision: Literal) -> Option<Literal> {
     process(value, Some(precision), f64::ceil)
 }
 
-pub fn floor(value: Literal) -> Literal {
+pub fn floor(value: Literal) -> Option<Literal> {
     process(value, None, f64::floor)
 }
 
-pub fn floorprec(value: Literal, precision: Literal) -> Literal {
+pub fn floorprec(value: Literal, precision: Literal) -> Option<Literal> {
     process(value, Some(precision), f64::floor)
 }
 
-pub fn round(value: Literal) -> Literal {
+pub fn round(value: Literal) -> Option<Literal> {
     process(value, None, f64::round)
 }
 
-pub fn roundprec(value: Literal, precision: Literal) -> Literal {
+pub fn roundprec(value: Literal, precision: Literal) -> Option<Literal> {
     process(value, Some(precision), f64::round)
 }
 
-pub fn trunc(value: Literal) -> Literal {
+pub fn trunc(value: Literal) -> Option<Literal> {
     process(value, None, f64::trunc)
 }
 
-pub fn truncprec(value: Literal, precision: Literal) -> ComputeResult<Literal> {
+pub fn truncprec(value: Literal, precision: Literal) -> ComputeResult<Option<Literal>> {
     if let Literal::Float(_) = precision {
         return Err(ComputeError::InvalidTruncatePrecision(precision));
     }
@@ -83,7 +83,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = ceil(input);
+            let actual = ceil(input).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -102,7 +102,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = floor(input);
+            let actual = floor(input).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -121,7 +121,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = round(input);
+            let actual = round(input).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -140,7 +140,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = trunc(input);
+            let actual = trunc(input).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -159,7 +159,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = ceilprec(input.0, input.1);
+            let actual = ceilprec(input.0, input.1).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -178,7 +178,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = ceilprec(input.0, input.1);
+            let actual = ceilprec(input.0, input.1).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -197,7 +197,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = floorprec(input.0, input.1);
+            let actual = floorprec(input.0, input.1).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -216,7 +216,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = floorprec(input.0, input.1);
+            let actual = floorprec(input.0, input.1).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -235,7 +235,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = roundprec(input.0, input.1);
+            let actual = roundprec(input.0, input.1).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -254,7 +254,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = roundprec(input.0, input.1);
+            let actual = roundprec(input.0, input.1).unwrap();
             assert_eq!(actual, expected);
         });
     }
@@ -273,7 +273,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(input, expected)| {
-            let actual = truncprec(input.0, input.1).unwrap();
+            let actual = truncprec(input.0, input.1).unwrap().unwrap();
             assert_eq!(actual, expected);
         });
     }

@@ -13,6 +13,13 @@ impl Literal {
             _ => self,
         }
     }
+
+    pub fn as_f64(self) -> f64 {
+        match self {
+            Self::Integer(i) => i as f64,
+            Self::Float(f) => f,
+        }
+    }
 }
 
 impl std::fmt::Display for Literal {

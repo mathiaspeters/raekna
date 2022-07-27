@@ -16,53 +16,65 @@ pub fn evaluate_fn(fn_name: FunctionName, args: Vec<Literal>) -> ComputeResult<L
             supplied_argument_count: args.len(),
         });
     }
-    match fn_name {
+    let result = match fn_name {
         // Arithmetic
         FunctionName::Negate => arithmetic::negate(args[0]),
-        FunctionName::Add => Ok(arithmetic::add(args[0], args[1])),
-        FunctionName::Subtract => Ok(arithmetic::sub(args[0], args[1])),
-        FunctionName::Multiply => Ok(arithmetic::mul(args[0], args[1])),
-        FunctionName::Divide => Ok(arithmetic::div(args[0], args[1])),
-        FunctionName::Modulus => Ok(arithmetic::mod0(args[0], args[1])),
+        FunctionName::Add => arithmetic::add(args[0], args[1]),
+        FunctionName::Subtract => arithmetic::sub(args[0], args[1]),
+        FunctionName::Multiply => arithmetic::mul(args[0], args[1]),
+        FunctionName::Divide => arithmetic::div(args[0], args[1])?,
+        FunctionName::Modulus => arithmetic::mod0(args[0], args[1])?,
         FunctionName::Power => arithmetic::pow(args[0], args[1]),
 
         // Trigonometry
-        FunctionName::Sin => Ok(trigonometry::sin(args[0])),
-        FunctionName::Cos => Ok(trigonometry::cos(args[0])),
-        FunctionName::Tan => Ok(trigonometry::tan(args[0])),
-        FunctionName::SinH => Ok(trigonometry::sinh(args[0])),
-        FunctionName::CosH => Ok(trigonometry::cosh(args[0])),
-        FunctionName::TanH => Ok(trigonometry::tanh(args[0])),
-        FunctionName::ArcSin => Ok(trigonometry::asin(args[0])),
-        FunctionName::ArcCos => Ok(trigonometry::acos(args[0])),
-        FunctionName::ArcTan => Ok(trigonometry::atan(args[0])),
-        FunctionName::ArcSinH => Ok(trigonometry::asinh(args[0])),
-        FunctionName::ArcCosH => Ok(trigonometry::acosh(args[0])),
-        FunctionName::ArcTanH => Ok(trigonometry::atanh(args[0])),
+        FunctionName::Sin => trigonometry::sin(args[0]),
+        FunctionName::Cos => trigonometry::cos(args[0]),
+        FunctionName::Tan => trigonometry::tan(args[0]),
+        FunctionName::SinH => trigonometry::sinh(args[0]),
+        FunctionName::CosH => trigonometry::cosh(args[0]),
+        FunctionName::TanH => trigonometry::tanh(args[0]),
+        FunctionName::ArcSin => trigonometry::asin(args[0]),
+        FunctionName::ArcCos => trigonometry::acos(args[0]),
+        FunctionName::ArcTan => trigonometry::atan(args[0]),
+        FunctionName::ArcSinH => trigonometry::asinh(args[0]),
+        FunctionName::ArcCosH => trigonometry::acosh(args[0]),
+        FunctionName::ArcTanH => trigonometry::atanh(args[0]),
 
         // Misc math
-        FunctionName::SquareRoot => misc_math::sqrt(args[0]),
+        FunctionName::SquareRoot => misc_math::sqrt(args[0])?,
         FunctionName::CubeRoot => misc_math::cbrt(args[0]),
-        FunctionName::Factorial => misc_math::factorial(args[0]),
+        FunctionName::Factorial => misc_math::factorial(args[0])?,
         FunctionName::Log => misc_math::log(args[0], args[1]),
         FunctionName::Log2 => misc_math::log2(args[0]),
         FunctionName::Log10 => misc_math::log10(args[0]),
         FunctionName::Ln => misc_math::ln(args[0]),
-        FunctionName::Abs => Ok(misc_math::abs(args[0])),
+        FunctionName::Abs => misc_math::abs(args[0]),
 
         // Rounding
-        FunctionName::Ceil => Ok(rounding::ceil(args[0])),
-        FunctionName::CeilPrec => Ok(rounding::ceilprec(args[0], args[1])),
-        FunctionName::Floor => Ok(rounding::floor(args[0])),
-        FunctionName::FloorPrec => Ok(rounding::floorprec(args[0], args[1])),
-        FunctionName::Round => Ok(rounding::round(args[0])),
-        FunctionName::RoundPrec => Ok(rounding::roundprec(args[0], args[1])),
-        FunctionName::Trunc => Ok(rounding::trunc(args[0])),
-        FunctionName::TruncPrec => rounding::truncprec(args[0], args[1]),
+        FunctionName::Ceil => rounding::ceil(args[0]),
+        FunctionName::CeilPrec => rounding::ceilprec(args[0], args[1]),
+        FunctionName::Floor => rounding::floor(args[0]),
+        FunctionName::FloorPrec => rounding::floorprec(args[0], args[1]),
+        FunctionName::Round => rounding::round(args[0]),
+        FunctionName::RoundPrec => rounding::roundprec(args[0], args[1]),
+        FunctionName::Trunc => rounding::trunc(args[0]),
+        FunctionName::TruncPrec => rounding::truncprec(args[0], args[1])?,
 
         // Comparisons
-        FunctionName::Max => Ok(comparisons::max(args[0], args[1])),
-        FunctionName::Min => Ok(comparisons::min(args[0], args[1])),
+        FunctionName::Max => comparisons::max(args[0], args[1]),
+        FunctionName::Min => comparisons::min(args[0], args[1]),
+    };
+    match result {
+        Some(result) => Ok(result),
+        None => Err(ComputeError::ResultTooBig(fn_name, args)),
+    }
+}
+
+fn validate_and_wrap(value: f64) -> Option<Literal> {
+    if value.is_normal() || value == 0.0 {
+        Some(Literal::from(value))
+    } else {
+        None
     }
 }
 
