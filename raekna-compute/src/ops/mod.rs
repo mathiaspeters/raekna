@@ -4,6 +4,7 @@ use crate::errors::{ComputeError, ComputeResult};
 
 mod arithmetic;
 mod comparisons;
+pub mod constants;
 mod misc_math;
 mod rounding;
 mod trigonometry;

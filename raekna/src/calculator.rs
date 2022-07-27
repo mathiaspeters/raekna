@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use raekna_common::{
-    errors::CommonResult, expression::Literal, EditAction, EditPosition, RCalculator,
-};
+use raekna_common::{errors::CommonResult, EditAction, EditPosition, RCalculator};
 use raekna_compute::evaluate;
 use raekna_parser::parse;
 use raekna_storage::storage::Storage;
@@ -10,19 +8,6 @@ use raekna_storage::storage::Storage;
 #[derive(Debug, Default)]
 pub struct Calculator {
     storage: Storage,
-}
-
-impl Calculator {
-    fn init_variables() -> HashMap<String, Literal> {
-        let mut variables = HashMap::with_capacity(6);
-        variables.insert("e".to_string(), Literal::Float(std::f64::consts::E));
-        variables.insert("E".to_string(), Literal::Float(std::f64::consts::E));
-        variables.insert("pi".to_string(), Literal::Float(std::f64::consts::PI));
-        variables.insert("PI".to_string(), Literal::Float(std::f64::consts::PI));
-        variables.insert("tau".to_string(), Literal::Float(std::f64::consts::TAU));
-        variables.insert("TAU".to_string(), Literal::Float(std::f64::consts::TAU));
-        variables
-    }
 }
 
 impl RCalculator for Calculator {
@@ -36,7 +21,7 @@ impl RCalculator for Calculator {
 
     fn update_line(&mut self, actions: Vec<EditAction>) {
         self.storage.handle_actions(actions);
-        let mut variables = Self::init_variables();
+        let mut variables = HashMap::new();
         let (contents, results) = self.storage.get_lines_mut();
         results.iter_mut().zip(contents.iter()).for_each(|(r, c)| {
             let ast = parse(c);
