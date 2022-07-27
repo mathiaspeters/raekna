@@ -1,6 +1,6 @@
 use crate::function_name::FunctionName;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub enum Literal {
     Integer(i64),
     Float(f64),
@@ -18,6 +18,16 @@ impl Literal {
         match self {
             Self::Integer(i) => i as f64,
             Self::Float(f) => f,
+        }
+    }
+}
+
+impl PartialEq for Literal {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Float(_), Self::Integer(_)) | (Self::Integer(_), Self::Float(_)) => false,
+            (Self::Integer(left), Self::Integer(right)) => *left == *right,
+            (Self::Float(left), Self::Float(right)) => (*left - *right).abs() < f64::EPSILON,
         }
     }
 }
