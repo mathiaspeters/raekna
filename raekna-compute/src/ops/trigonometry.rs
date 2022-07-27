@@ -222,7 +222,7 @@ mod tests {
                 (Literal::Integer(-5), Literal::Float(-74.20321057778875)),
                 (Literal::Integer(0), Literal::Integer(0)),
                 (Literal::Integer(99), Literal::Float(4.944515159673473e42)),
-                (Literal::Float(-22.2), Literal::Float(-2189311219.014474)),
+                (Literal::Float(-2.22), Literal::Float(-4.549360878528647)),
                 (Literal::Float(0.0), Literal::Integer(0)),
                 (Literal::Float(67.89), Literal::Float(1.5248333457506416e29)),
             ];

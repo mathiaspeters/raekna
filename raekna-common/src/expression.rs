@@ -27,7 +27,7 @@ impl PartialEq for Literal {
         match (self, other) {
             (Self::Float(_), Self::Integer(_)) | (Self::Integer(_), Self::Float(_)) => false,
             (Self::Integer(left), Self::Integer(right)) => *left == *right,
-            (Self::Float(left), Self::Float(right)) => (*left - *right).abs() < f64::EPSILON,
+            (Self::Float(left), Self::Float(right)) => (*left - *right).abs() <= f64::EPSILON,
         }
     }
 }
