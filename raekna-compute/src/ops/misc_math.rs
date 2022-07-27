@@ -316,27 +316,27 @@ mod tests {
                 let value = Literal::from(value);
                 let actual = factorial(value);
                 let expected = match raw {
-                    0 => Ok(Literal::Integer(0)),
-                    1 => Ok(Literal::Integer(1)),
-                    2 => Ok(Literal::Integer(2)),
-                    3 => Ok(Literal::Integer(6)),
-                    4 => Ok(Literal::Integer(24)),
-                    5 => Ok(Literal::Integer(120)),
-                    6 => Ok(Literal::Integer(720)),
-                    7 => Ok(Literal::Integer(5040)),
-                    8 => Ok(Literal::Integer(40320)),
-                    9 => Ok(Literal::Integer(362880)),
-                    10 => Ok(Literal::Integer(3628800)),
-                    11 => Ok(Literal::Integer(39916800)),
-                    12 => Ok(Literal::Integer(479001600)),
-                    13 => Ok(Literal::Integer(6227020800)),
-                    14 => Ok(Literal::Integer(87178291200)),
-                    15 => Ok(Literal::Integer(1307674368000)),
-                    16 => Ok(Literal::Integer(20922789888000)),
-                    17 => Ok(Literal::Integer(355687428096000)),
-                    18 => Ok(Literal::Integer(6402373705728000)),
-                    19 => Ok(Literal::Integer(121645100408832000)),
-                    20 => Ok(Literal::Integer(2432902008176640000)),
+                    0  => Ok(Literal::Integer(                        0)),
+                    1  => Ok(Literal::Integer(                        1)),
+                    2  => Ok(Literal::Integer(                        2)),
+                    3  => Ok(Literal::Integer(                        6)),
+                    4  => Ok(Literal::Integer(                       24)),
+                    5  => Ok(Literal::Integer(                      120)),
+                    6  => Ok(Literal::Integer(                      720)),
+                    7  => Ok(Literal::Integer(                    5_040)),
+                    8  => Ok(Literal::Integer(                   40_320)),
+                    9  => Ok(Literal::Integer(                  362_880)),
+                    10 => Ok(Literal::Integer(                3_628_800)),
+                    11 => Ok(Literal::Integer(               39_916_800)),
+                    12 => Ok(Literal::Integer(              479_001_600)),
+                    13 => Ok(Literal::Integer(            6_227_020_800)),
+                    14 => Ok(Literal::Integer(           87_178_291_200)),
+                    15 => Ok(Literal::Integer(        1_307_674_368_000)),
+                    16 => Ok(Literal::Integer(       20_922_789_888_000)),
+                    17 => Ok(Literal::Integer(      355_687_428_096_000)),
+                    18 => Ok(Literal::Integer(    6_402_373_705_728_000)),
+                    19 => Ok(Literal::Integer(  121_645_100_408_832_000)),
+                    20 => Ok(Literal::Integer(2_432_902_008_176_640_000)),
                     _ => Err(ComputeError::InvalidFactorialArgument(Literal::Integer(raw)))
                 };
                 assert_eq!(actual, expected);
@@ -400,7 +400,7 @@ mod tests {
 
         proptest! {
             #[test]
-            fn proptest_f64(value: f64, base: f64) {
+            fn proptest_f64_f64(value: f64, base: f64) {
                 let expected_raw = value.log(base);
                 let expected = Literal::from(expected_raw);
 
@@ -423,7 +423,53 @@ mod tests {
             }
 
             #[test]
-            fn proptest_i64(value: i64, base: i64) {
+            fn proptest_f64_i64(value: f64, base: i64) {
+                let expected_raw = value.log(base as f64);
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Float(value);
+                let base = Literal::Integer(base);
+                let actual = log(value, base);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    match actual.unwrap_err() {
+                        ComputeError::InvalidLogarithm {..} => {}
+                        actual_err @ _ => {
+                            dbg!(actual_err);
+                            prop_assert!(false);
+                        }
+                    }
+                }
+            }
+
+            #[test]
+            fn proptest_i64_f64(value: i64, base: f64) {
+                let expected_raw = (value as f64).log(base);
+                let expected = Literal::from(expected_raw);
+
+                let value = Literal::Integer(value);
+                let base = Literal::Float(base);
+                let actual = log(value, base);
+
+                if expected_raw.is_normal() || expected_raw == 0.0 {
+                    let actual = actual.unwrap();
+                    prop_assert_eq!(actual, expected);
+                } else {
+                    match actual.unwrap_err() {
+                        ComputeError::InvalidLogarithm {..} => {}
+                        actual_err @ _ => {
+                            dbg!(actual_err);
+                            prop_assert!(false);
+                        }
+                    }
+                }
+            }
+
+            #[test]
+            fn proptest_i64_i64(value: i64, base: i64) {
                 let expected_raw = (value as f64).log(base as f64);
                 let expected = Literal::from(expected_raw);
 
