@@ -193,7 +193,7 @@ mod tests {
                 // Integers
                 (int(0), int(0)),
                 (int(5), float(1.709975946676697)),
-                (int(27), int(3)),
+                (int(48), int(4)),
                 (int(-125), int(-5)),
                 // Floats
                 (float(7.8), float(1.9831924826807747)),
