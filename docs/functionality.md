@@ -1,5 +1,9 @@
 # Functionality
 
+## Limitations
+
+The current architecture limits numeric values to what a 64-bit floating point value can hold, which has a lower bound of `-1.7976931348623157e308` and an upper bound of `1.7976931348623157e308`. There are plans to allow for much bigger numbers eventually but for now you will get an error if your literals or the results of your calculations exceed those bounds. Similarly you will get an error if you are trying to perform an invalid calculation, like getting the logarithm or square root of a negative number. 
+
 ## Literals
 
 Literals can be expressed in a few different ways:
@@ -17,6 +21,17 @@ Example:
 my_var: 5     |     5
 2 * my_var    |    10
 ```
+
+## Constants
+
+Raekna supports some built-in mathematical constants, currently `pi`, `tau` and `e`.
+```
+pi      | 3.1415...
+tau     | 6.2831...
+e       | 2.7182...
+```
+
+The constants are case-insensitive so `pi`, `PI`, `Pi` will all return the value of `pi`.
 
 ## Operations
 
@@ -106,31 +121,153 @@ maximum(left, right)
 
 ### Rounding
 
-Ceil/CeilPrec
-Floor/FloorPrec
-Round/RoundPrec
-Trunc/TruncPrec
+All rounding functions will assume you are trying to round the the relevant integer value, but you can customize the result. All rounding functions accept a precision as an integer value that will determine how many decimals to include. Additionally, `ceil`, `floor`, and `round` can instead accept a stepping value as a floating point value and will round to relevant multiple of that stepping.
+
+**Ceil**
+
+```
+ceil(value)
+ceil(value, precision)
+ceil(value, stepping)
+
+ceil(5.4)       | 6         # Normal ceil
+ceil(1.2345, 2) | 1.24      # Ceil with precision
+ceil(1, 2.4)    | 2.4       # Ceil with stepping
+```
+
+**Floor**
+
+```
+floor(value)
+floor(value, precision)
+floor(value, stepping)
+
+floor(5.9)       | 5         # Normal floor
+floor(9.8765, 2) | 9.87      # Floor with precision
+floor(4.7, 2.4)  | 2.4       # Floor with stepping
+```
+
+**Round**
+
+```
+round(value)
+round(value, precision)
+round(value, stepping)
+
+round(5.9)       | 6         # Normal round
+round(5.4)       | 5         # Normal round
+round(9.8765, 2) | 9.88      # Round with precision
+round(9.8735, 2) | 9.87      # Round with precision
+round(4.9, 2.4)  | 4.8       # Round with stepping
+round(4.7, 2.4)  | 2.4       # Round with stepping
+```
+
+**Trunc**
+
+```
+trunc(value)
+trunc(value, precision)
+
+trunc(5.9)       | 5         # Normal trunc
+trunc(9.8765, 2) | 9.87      # Trunc with precision
+trunc(4.7, 2.4)  | Error     # Trunc with stepping
+```
+
 
 ### Trigonometry
 
-Sin
-Cos
-Tan
-SinH
-CosH
-TanH
-ArcSin
-ArcCos
-ArcTan
-ArcSinH
-ArcCosH
-ArcTanH
+All trigonometric functions work with radians.
+
+**Sin**
+
+Computes the sine of the given argument.
+```
+sin(arg)
+```
+
+**Cos**
+
+Computes the cosine of the given argument.
+```
+cos(arg)
+```
+
+**Tan**
+
+Computes the tangent of the given number.
+```
+tan(arg)
+```
+
+**SinH**
+
+Hyperbolic sine function.
+```
+sinh(arg)
+```
+
+**CosH**
+
+Hyperbolic cosine function.
+```
+cosh(arg)
+```
+
+**TanH**
+
+Hyperbolic tangent function.
+```
+tanh(arg)
+```
+
+**ArcSin**
+
+Computes the arcsine of the given argument.
+```
+asin(arg)
+```
+
+**ArcCos**
+
+Computes the arccosine of the given argument.
+```
+acos(arg)
+```
+
+**ArcTan**
+
+Computes the arctangent of the given number.
+```
+atan(arg)
+```
+
+**ArcSinH**
+
+Inverse hyperbolic sine function.
+```
+asinh(arg)
+```
+
+**ArcCosH**
+
+Inverse hyperbolic cosine function.
+```
+acosh(arg)
+```
+
+**ArcTanH**
+
+Inverse hyperbolic tangent function.
+```
+atanh(arg)
+```
+
 
 ### Miscellaneous math
 
 **Square root**
 
-Computes the square root of a number. The argument has to be a positive number.
+Computes the square root of a number.
 ```
 sqrt(arg)
 squareroot(arg)
@@ -156,28 +293,28 @@ factorial(arg)
 
 **Log**
 
-Computes the logarithm of a value with a given base. The given value must be larger than 0 and the base must be 0 or larger.
+Computes the logarithm of a value with a given base.
 ```
 log(value, base)
 ```
 
 **Log2**
 
-Computes the logarithm of a value with a base of 2. The given value must be larger than 0.
+Computes the logarithm of a value with a base of 2.
 ```
 log2(arg)
 ```
 
 **Log10**
 
-Computes the logarithm of a value with a base of 10. The given value must be larger than 0.
+Computes the logarithm of a value with a base of 10.
 ```
 log10(arg)
 ```
 
 **Ln**
 
-Computes the natural logarithm of a value. The given value must be larger than 0.
+Computes the natural logarithm of a value.
 ```
 ln(arg)
 ```
