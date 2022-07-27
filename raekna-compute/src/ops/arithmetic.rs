@@ -14,46 +14,26 @@ pub fn negate(value: Literal) -> Option<Literal> {
 }
 
 pub fn add(left: Literal, right: Literal) -> Option<Literal> {
-    use Literal::*;
-    let sum = match (left, right) {
-        (Integer(left), Integer(right)) => match left.checked_add(right) {
-            Some(res) => return Some(Integer(res)),
-            None => (left as f64) + (right as f64),
-        },
-        (Integer(i), Float(f)) | (Float(f), Integer(i)) => f + (i as f64),
-        (Float(left), Float(right)) => left + right,
-    };
+    let left = left.as_f64();
+    let right = right.as_f64();
+    let sum = left + right;
     validate_and_wrap(sum)
 }
 
 pub fn sub(left: Literal, right: Literal) -> Option<Literal> {
-    use Literal::*;
-    let difference = match (left, right) {
-        (Integer(left), Integer(right)) => match left.checked_sub(right) {
-            Some(res) => return Some(Integer(res)),
-            None => (left as f64) - (right as f64),
-        },
-        (Integer(i), Float(f)) => (i as f64) - f,
-        (Float(f), Integer(i)) => f - (i as f64),
-        (Float(left), Float(right)) => left - right,
-    };
+    let left = left.as_f64();
+    let right = right.as_f64();
+    let difference = left - right;
     validate_and_wrap(difference)
 }
 
 pub fn mul(left: Literal, right: Literal) -> Option<Literal> {
-    use Literal::*;
-    let product = match (left, right) {
-        (Integer(left), Integer(right)) => match left.checked_mul(right) {
-            Some(res) => return Some(Integer(res)),
-            None => (left as f64) * (right as f64),
-        },
-        (Integer(i), Float(f)) | (Float(f), Integer(i)) => f * (i as f64),
-        (Float(left), Float(right)) => left * right,
-    };
+    let left = left.as_f64();
+    let right = right.as_f64();
+    let product = left * right;
     validate_and_wrap(product)
 }
 
-// TODO: division by 0
 pub fn div(dividend: Literal, divisor: Literal) -> ComputeResult<Option<Literal>> {
     let dividend = dividend.as_f64();
     let divisor = divisor.as_f64();
@@ -76,14 +56,10 @@ pub fn mod0(dividend: Literal, divisor: Literal) -> ComputeResult<Option<Literal
     }
 }
 
-pub fn pow(left: Literal, right: Literal) -> Option<Literal> {
-    use Literal::*;
-    let power = match (left, right) {
-        (Integer(left), Integer(right)) => (left as f64).powf(right as f64),
-        (Integer(i), Float(f)) => (i as f64).powf(f),
-        (Float(f), Integer(i)) => f.powf(i as f64),
-        (Float(left), Float(right)) => left.powf(right),
-    };
+pub fn pow(base: Literal, exponent: Literal) -> Option<Literal> {
+    let base = base.as_f64();
+    let exponent = exponent.as_f64();
+    let power = base.powf(exponent);
     validate_and_wrap(power)
 }
 
