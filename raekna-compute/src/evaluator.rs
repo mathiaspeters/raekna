@@ -4,7 +4,7 @@ use raekna_common::expression::{Expression, Literal};
 
 use crate::{
     errors::{ComputeError, ComputeResult},
-    ops::evaluate_fn,
+    ops::{constants, evaluate_fn},
 };
 
 pub fn evaluate(
@@ -12,13 +12,14 @@ pub fn evaluate(
     variables: &mut HashMap<String, Literal>,
 ) -> ComputeResult<Literal> {
     match expression {
-        Expression::Variable(name, expr) => {
-            let res = evaluate_to_literal(&expr, variables)?;
-            if variables.insert(name.clone(), res).is_some() {
-                return Err(ComputeError::DuplicateVariable(name));
+        Expression::Variable(name, expr) => match constants::evaluate(&name) {
+            Some(_) => Err(ComputeError::VariableNameTaken(name)),
+            None => {
+                let res = evaluate_to_literal(&expr, variables)?;
+                variables.insert(name, res);
+                Ok(res)
             }
-            Ok(res)
-        }
+        },
         expr => {
             let res = evaluate_to_literal(&expr, variables)?;
             Ok(res)
@@ -34,10 +35,13 @@ fn evaluate_to_literal(
         Expression::Literal(literal) => Ok(*literal),
         Expression::Variable(_, _) => unreachable!(),
         Expression::VariableRef(var_name) => {
-            let value = variables
-                .get(var_name.as_str())
-                .ok_or_else(|| ComputeError::UnknownVariable(var_name.clone()))?;
-            Ok(*value)
+            let value = constants::evaluate(var_name).map(Ok).unwrap_or_else(|| {
+                variables
+                    .get(var_name.as_str())
+                    .copied()
+                    .ok_or_else(|| ComputeError::UnknownVariable(var_name.clone()))
+            })?;
+            Ok(value)
         }
         Expression::Function(fn_name, args) => {
             let args = args

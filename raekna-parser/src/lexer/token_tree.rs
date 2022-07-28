@@ -61,6 +61,37 @@ mod tests {
     }
 
     #[test]
+    fn function_with_negative_arguments() {
+        let input = "add(-1, -2)";
+
+        let expected = TokenTree {
+            num_operators: 0,
+            tokens: vec![Token::Function(
+                "add".to_owned(),
+                vec![
+                    TokenTree {
+                        num_operators: 1,
+                        tokens: vec![
+                            Token::Operator(Operator::Subtract),
+                            Token::Literal(Literal::Integer(1)),
+                        ],
+                    },
+                    TokenTree {
+                        num_operators: 1,
+                        tokens: vec![
+                            Token::Operator(Operator::Subtract),
+                            Token::Literal(Literal::Integer(2)),
+                        ],
+                    },
+                ],
+            )],
+        };
+        let (_, actual) = TokenTree::parse_input(input).unwrap();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
     fn scenario1() {
         let input = "var_def: pow(sqrt(var_ref), 5 / 2.0) * (1e2 + 2.2)";
 

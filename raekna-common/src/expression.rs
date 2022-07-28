@@ -1,8 +1,6 @@
-use std::fmt;
-
 use crate::function_name::FunctionName;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub enum Literal {
     Integer(i64),
     Float(f64),
@@ -13,6 +11,23 @@ impl Literal {
         match self {
             Self::Float(value) if value.fract().abs() < f64::EPSILON => Self::Integer(value as i64),
             _ => self,
+        }
+    }
+
+    pub fn as_f64(self) -> f64 {
+        match self {
+            Self::Integer(i) => i as f64,
+            Self::Float(f) => f,
+        }
+    }
+}
+
+impl PartialEq for Literal {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Float(_), Self::Integer(_)) | (Self::Integer(_), Self::Float(_)) => false,
+            (Self::Integer(left), Self::Integer(right)) => *left == *right,
+            (Self::Float(left), Self::Float(right)) => (*left - *right).abs() <= f64::EPSILON,
         }
     }
 }
@@ -35,7 +50,9 @@ impl From<i64> for Literal {
 
 impl From<f64> for Literal {
     fn from(value: f64) -> Self {
-        if value.fract().abs() < f64::EPSILON {
+        if value > i64::MAX as f64 {
+            Self::Float(value)
+        } else if value.fract().abs() < f64::EPSILON {
             Self::Integer(value as i64)
         } else {
             Self::Float(value)
@@ -49,22 +66,4 @@ pub enum Expression {
     Variable(String, Box<Expression>),
     VariableRef(String),
     Function(FunctionName, Vec<Expression>),
-}
-
-impl fmt::Display for Expression {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Expression::Literal(literal) => write!(f, "{literal}"),
-            Expression::Variable(name, expr) => write!(f, "{name}: {expr}"),
-            Expression::VariableRef(name) => write!(f, "{name}"),
-            Expression::Function(function_name, arguments) => {
-                let args = arguments
-                    .iter()
-                    .map(|e| e.to_string())
-                    .collect::<Vec<_>>()
-                    .join(", ");
-                write!(f, "{function_name}({args})",)
-            }
-        }
-    }
 }

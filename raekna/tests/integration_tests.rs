@@ -18,3 +18,18 @@ fn test_simple_literal() {
 
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn test_function_with_negative_argument() {
+    let mut variables = HashMap::new();
+
+    let input = "add(-1, -2)";
+
+    let expected = Literal::Integer(-3);
+    let actual = {
+        let parsed = parse(input).unwrap();
+        evaluate(parsed, &mut variables).unwrap()
+    };
+
+    assert_eq!(actual, expected);
+}

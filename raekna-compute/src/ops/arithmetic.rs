@@ -1,185 +1,72 @@
 use raekna_common::expression::Literal;
 
-use crate::errors::{ComputeError, ComputeResult};
+use crate::{
+    errors::{ComputeError, ComputeResult},
+    ops::validate_and_wrap,
+};
 
-pub fn sqrt(value: Literal) -> ComputeResult<Literal> {
-    use Literal::*;
-    let root = match value {
-        Integer(value) => (value as f64).sqrt(),
-        Float(value) => value.sqrt(),
-    };
-    if root.is_normal() || root == 0.0 {
-        Ok(Literal::from(root))
-    } else {
-        Err(ComputeError::InvalidSquareRoot(value))
-    }
-}
-
-pub fn factorial(value: Literal) -> ComputeResult<Literal> {
-    use Literal::*;
-    match value {
-        Integer(val) if val < 0 => {
-            // TODO: Support factorial with negative numbers at some point
-            Err(ComputeError::InvalidFactorialArgument(value))
-        }
-        Integer(value) if value <= 20 => {
-            let mut result = 1;
-            for i in 1..=value {
-                result *= i;
-            }
-            Ok(Integer(result))
-        }
-        _ => Err(ComputeError::InvalidFactorialArgument(value)),
-    }
-}
-
-pub fn negate(value: Literal) -> ComputeResult<Literal> {
+pub fn negate(value: Literal) -> Option<Literal> {
     let res = match value {
         Literal::Integer(i) => Literal::Integer(-i),
         Literal::Float(f) => Literal::Float(-f),
     };
-    Ok(res)
+    Some(res)
 }
 
-pub fn add(left: Literal, right: Literal) -> Literal {
-    use Literal::*;
-    let sum = match (left, right) {
-        (Integer(left), Integer(right)) => match left.checked_add(right) {
-            Some(res) => return Integer(res),
-            None => (left as f64) + (right as f64),
-        },
-        (Integer(i), Float(f)) | (Float(f), Integer(i)) => f + (i as f64),
-        (Float(left), Float(right)) => left + right,
-    };
-    Literal::from(sum)
+pub fn add(left: Literal, right: Literal) -> Option<Literal> {
+    let left = left.as_f64();
+    let right = right.as_f64();
+    let sum = left + right;
+    validate_and_wrap(sum)
 }
 
-pub fn sub(left: Literal, right: Literal) -> Literal {
-    use Literal::*;
-    let difference = match (left, right) {
-        (Integer(left), Integer(right)) => match left.checked_sub(right) {
-            Some(res) => return Integer(res),
-            None => (left as f64) - (right as f64),
-        },
-        (Integer(i), Float(f)) => (i as f64) - f,
-        (Float(f), Integer(i)) => f - (i as f64),
-        (Float(left), Float(right)) => left - right,
-    };
-    Literal::from(difference)
+pub fn sub(left: Literal, right: Literal) -> Option<Literal> {
+    let left = left.as_f64();
+    let right = right.as_f64();
+    let difference = left - right;
+    validate_and_wrap(difference)
 }
 
-pub fn mul(left: Literal, right: Literal) -> Literal {
-    use Literal::*;
-    let product = match (left, right) {
-        (Integer(left), Integer(right)) => match left.checked_mul(right) {
-            Some(res) => return Integer(res),
-            None => (left as f64) * (right as f64),
-        },
-        (Integer(i), Float(f)) | (Float(f), Integer(i)) => f * (i as f64),
-        (Float(left), Float(right)) => left * right,
-    };
-    Literal::from(product)
+pub fn mul(left: Literal, right: Literal) -> Option<Literal> {
+    let left = left.as_f64();
+    let right = right.as_f64();
+    let product = left * right;
+    validate_and_wrap(product)
 }
 
-pub fn div(left: Literal, right: Literal) -> Literal {
-    use Literal::*;
-    let quotient = match (left, right) {
-        (Integer(left), Integer(right)) => {
-            let res = (left as f64) / (right as f64);
-            if res.fract().abs() < f64::EPSILON {
-                return Integer(res as i64);
-            } else {
-                res
-            }
-        }
-        (Integer(i), Float(f)) => (i as f64) / f,
-        (Float(f), Integer(i)) => f / (i as f64),
-        (Float(left), Float(right)) => left / right,
-    };
-    Literal::from(quotient)
-}
-
-pub fn mod0(left: Literal, right: Literal) -> Literal {
-    use Literal::*;
-    let remainder = match (left, right) {
-        (Integer(left), Integer(right)) => match left.checked_rem(right) {
-            Some(res) => return Integer(res),
-            None => (left as f64) % (right as f64),
-        },
-        (Integer(i), Float(f)) => (i as f64) % f,
-        (Float(f), Integer(i)) => f % (i as f64),
-        (Float(left), Float(right)) => left % right,
-    };
-    Literal::from(remainder)
-}
-
-pub fn pow(left: Literal, right: Literal) -> ComputeResult<Literal> {
-    use Literal::*;
-    let power = match (left, right) {
-        (Integer(left), Integer(right)) => (left as f64).powf(right as f64),
-        (Integer(i), Float(f)) => (i as f64).powf(f),
-        (Float(f), Integer(i)) => f.powf(i as f64),
-        (Float(left), Float(right)) => left.powf(right),
-    };
-    if power.is_normal() || power == 0.0 {
-        Ok(Literal::from(power))
+pub fn div(dividend: Literal, divisor: Literal) -> ComputeResult<Option<Literal>> {
+    let dividend = dividend.as_f64();
+    let divisor = divisor.as_f64();
+    if divisor == 0.0 {
+        Err(ComputeError::DivisionByZero)
     } else {
-        Err(ComputeError::InvalidPower {
-            factor: left,
-            exponent: right,
-        })
+        let quotient = dividend / divisor;
+        Ok(validate_and_wrap(quotient))
     }
+}
+
+pub fn mod0(dividend: Literal, divisor: Literal) -> ComputeResult<Option<Literal>> {
+    let dividend = dividend.as_f64();
+    let divisor = divisor.as_f64();
+    if divisor == 0.0 {
+        Err(ComputeError::DivisionByZero)
+    } else {
+        let remainder = dividend % divisor;
+        Ok(validate_and_wrap(remainder))
+    }
+}
+
+pub fn pow(base: Literal, exponent: Literal) -> Option<Literal> {
+    let base = base.as_f64();
+    let exponent = exponent.as_f64();
+    let power = base.powf(exponent);
+    validate_and_wrap(power)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::ops::test_utils::{float, int};
-
-    #[test]
-    fn square_root() {
-        let test_cases = [
-            // Integers
-            (int(0), int(0)),
-            (int(2), float(1.4142135623730951)),
-            (int(25), int(5)),
-            // Floats
-            (float(3.5), float(1.8708286933869707)),
-        ];
-        for (value, expected) in test_cases.into_iter() {
-            let actual = sqrt(value).unwrap();
-            assert_eq!(actual, expected);
-        }
-
-        let test_cases = [
-            int(-2),
-            float(f64::NAN),
-            float(f64::INFINITY),
-            float(f64::NEG_INFINITY),
-        ];
-        for value in test_cases.into_iter() {
-            sqrt(value).unwrap_err();
-        }
-    }
-
-    #[test]
-    fn test_factorial() {
-        let test_cases = [
-            (int(0), int(1)),
-            (int(2), int(2)),
-            (int(6), int(720)),
-            (int(11), int(39_916_800)),
-        ];
-        for (value, expected) in test_cases.into_iter() {
-            let actual = factorial(value).unwrap();
-            assert_eq!(actual, expected);
-        }
-
-        let test_cases = [int(-2), int(21), float(1.1)];
-        for value in test_cases.into_iter() {
-            factorial(value).unwrap_err();
-        }
-    }
 
     #[test]
     fn addition() {
@@ -205,7 +92,7 @@ mod tests {
             (float(-5.4), float(-8.5), float(-13.9)),
         ];
         for (left, right, expected) in test_cases.into_iter() {
-            let actual = add(left, right);
+            let actual = add(left, right).unwrap();
             assert_eq!(actual, expected);
         }
     }
@@ -234,7 +121,7 @@ mod tests {
             (float(-5.2), float(-8.4), float(3.2)),
         ];
         for (left, right, expected) in test_cases.into_iter() {
-            let actual = sub(left, right);
+            let actual = sub(left, right).unwrap();
             assert_eq!(actual, expected);
         }
     }
@@ -263,7 +150,7 @@ mod tests {
             (float(-5.0), float(-8.0), int(40)),
         ];
         for (left, right, expected) in test_cases.into_iter() {
-            let actual = mul(left, right);
+            let actual = mul(left, right).unwrap();
             assert_eq!(actual, expected);
         }
     }
@@ -293,7 +180,7 @@ mod tests {
             (float(-20.0), float(-5.0), int(4)),
         ];
         for (left, right, expected) in test_cases.into_iter() {
-            let actual = div(left, right);
+            let actual = div(left, right).unwrap().unwrap();
             assert_eq!(actual, expected);
         }
     }
@@ -322,7 +209,7 @@ mod tests {
             (float(-8.0), float(-5.0), int(-3)),
         ];
         for (left, right, expected) in test_cases.into_iter() {
-            let actual = mod0(left, right);
+            let actual = mod0(left, right).unwrap().unwrap();
             assert_eq!(actual, expected);
         }
     }
@@ -357,7 +244,7 @@ mod tests {
 
         let test_cases = [(int(-1), float(-0.1))];
         for (left, right) in test_cases.into_iter() {
-            pow(left, right).unwrap_err();
+            assert!(pow(left, right).is_none());
         }
     }
 }

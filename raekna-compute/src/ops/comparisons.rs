@@ -1,6 +1,6 @@
 use raekna_common::expression::Literal;
 
-pub fn min(left: Literal, right: Literal) -> Literal {
+pub fn min(left: Literal, right: Literal) -> Option<Literal> {
     use Literal::*;
     let right_is_bigger = match (left, right) {
         (Integer(left), Integer(right)) => left <= right,
@@ -8,14 +8,15 @@ pub fn min(left: Literal, right: Literal) -> Literal {
         (Float(f), Integer(i)) => f <= (i as f64),
         (Float(left), Float(right)) => left <= right,
     };
-    if right_is_bigger {
+    let result = if right_is_bigger {
         left.maybe_truncate()
     } else {
         right.maybe_truncate()
-    }
+    };
+    Some(result)
 }
 
-pub fn max(left: Literal, right: Literal) -> Literal {
+pub fn max(left: Literal, right: Literal) -> Option<Literal> {
     use Literal::*;
     let right_is_smaller = match (left, right) {
         (Integer(left), Integer(right)) => left >= right,
@@ -23,11 +24,12 @@ pub fn max(left: Literal, right: Literal) -> Literal {
         (Float(f), Integer(i)) => f >= (i as f64),
         (Float(left), Float(right)) => left >= right,
     };
-    if right_is_smaller {
+    let result = if right_is_smaller {
         left.maybe_truncate()
     } else {
         right.maybe_truncate()
-    }
+    };
+    Some(result)
 }
 
 #[cfg(test)]
@@ -59,7 +61,7 @@ mod tests {
             (float(-5.5), float(-8.5), float(-8.5)),
         ];
         for (left, right, expected) in test_cases.into_iter() {
-            let actual = min(left, right);
+            let actual = min(left, right).unwrap();
             assert_eq!(actual, expected);
         }
     }
@@ -88,7 +90,7 @@ mod tests {
             (float(-5.5), float(-8.5), float(-5.5)),
         ];
         for (left, right, expected) in test_cases.into_iter() {
-            let actual = max(left, right);
+            let actual = max(left, right).unwrap();
             assert_eq!(actual, expected);
         }
     }

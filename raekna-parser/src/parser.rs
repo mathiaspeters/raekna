@@ -40,7 +40,7 @@ impl Parser {
             variable: None,
             operators: Vec::with_capacity(num_operators),
             expressions: vec![],
-            is_sign: false,
+            is_sign: true,
             should_negate: false,
         }
     }
@@ -59,10 +59,10 @@ impl Parser {
                 Token::Literal(literal) => {
                     let sn = match literal {
                         Literal::Integer(i) => {
-                            LiteralExpr::Integer(i * if self.should_negate { -1 } else { 1 })
+                            LiteralExpr::Integer(if self.should_negate { -i } else { i })
                         }
                         Literal::Float(f) => {
-                            LiteralExpr::Float(f * if self.should_negate { -1.0 } else { 1.0 })
+                            LiteralExpr::Float(if self.should_negate { -f } else { f })
                         }
                     };
                     self.is_sign = false;
@@ -91,11 +91,18 @@ impl Parser {
                         .into_iter()
                         .map(|a| convert_token_tree(a, false))
                         .collect::<ParserResult<Vec<_>>>()?;
-                    let expr = Expression::Function(
-                        FunctionName::from_str(&name)
-                            .map_err(|_| ParserError::UnknownFunctionName(name))?,
-                        args,
-                    );
+                    let function = {
+                        use FunctionName::*;
+                        let function = FunctionName::from_str(&name)
+                            .map_err(|_| ParserError::UnknownFunctionName(name))?;
+                        match function {
+                            Ceil if args.len() == 2 => CeilPrec,
+                            Floor if args.len() == 2 => FloorPrec,
+                            Round if args.len() == 2 => RoundPrec,
+                            _ => function,
+                        }
+                    };
+                    let expr = Expression::Function(function, args);
                     let expr = self.maybe_negate(expr);
                     self.is_sign = false;
                     self.should_negate = false;
@@ -108,8 +115,20 @@ impl Parser {
                     self.variable = Some(name);
                     None
                 }
-                Token::VariableReference(name) => Some(Expression::VariableRef(name)),
-                Token::Nested(nested_tree) => Some(convert_token_tree(nested_tree, false)?),
+                Token::VariableReference(name) => {
+                    let expr = Expression::VariableRef(name);
+                    let expr = self.maybe_negate(expr);
+                    self.is_sign = false;
+                    self.should_negate = false;
+                    Some(expr)
+                }
+                Token::Nested(nested_tree) => {
+                    let expr = convert_token_tree(nested_tree, false)?;
+                    let expr = self.maybe_negate(expr);
+                    self.is_sign = false;
+                    self.should_negate = false;
+                    Some(expr)
+                }
             };
             if let Some(expr) = expr {
                 self.expressions.push(Some(expr));
@@ -373,6 +392,59 @@ mod tests {
                     ),
                 ],
             )),
+        );
+        let actual = convert_token_tree(tt, true).unwrap();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn negative_number() {
+        let tt = TokenTree {
+            num_operators: 1,
+            tokens: vec![
+                Token::Operator(Operator::Subtract),
+                Token::Literal(Literal::Integer(2)),
+            ],
+        };
+
+        let expected = Expression::Literal(LiteralExpr::Integer(-2));
+        let actual = convert_token_tree(tt, true).unwrap();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn function_with_negative_arguments() {
+        let tt = TokenTree {
+            num_operators: 0,
+            tokens: vec![Token::Function(
+                "add".to_owned(),
+                vec![
+                    TokenTree {
+                        num_operators: 1,
+                        tokens: vec![
+                            Token::Operator(Operator::Subtract),
+                            Token::Literal(Literal::Integer(1)),
+                        ],
+                    },
+                    TokenTree {
+                        num_operators: 1,
+                        tokens: vec![
+                            Token::Operator(Operator::Subtract),
+                            Token::Literal(Literal::Integer(2)),
+                        ],
+                    },
+                ],
+            )],
+        };
+
+        let expected = Expression::Function(
+            FunctionName::Add,
+            vec![
+                Expression::Literal(LiteralExpr::Integer(-1)),
+                Expression::Literal(LiteralExpr::Integer(-2)),
+            ],
         );
         let actual = convert_token_tree(tt, true).unwrap();
 
