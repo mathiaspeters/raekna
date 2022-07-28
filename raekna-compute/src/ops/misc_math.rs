@@ -194,7 +194,7 @@ mod tests {
                 (int(-125), int(-5)),
                 // Floats
                 (float(7.8), float(1.9831924826807747)),
-                (float(-11.1), float(-2.2306991044756197)),
+                (float(-10.648), float(-2.2)),
             ];
             for (value, expected) in test_cases.into_iter() {
                 let actual = cbrt(value).unwrap();
