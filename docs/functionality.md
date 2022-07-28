@@ -10,7 +10,7 @@ Literals can be expressed in a few different ways:
 
 - Integers: `10`, `6`, etc
 - Decimals: `2.2`, `10.9`, etc
-- Scientific notation: `1e5`, `10e6`, etc
+- Scientific notation: `1e5`, `8.25e6`, etc
 
 ## Variables
 
@@ -94,7 +94,7 @@ dividend % divisor
 
 **Power**
 
-Calculates the base the the power of the exponent.
+Calculates the base to the power of the exponent.
 ```
 pow(base, exponent)
 power(base, exponent)
@@ -105,7 +105,7 @@ base ^ exponent
 
 **Minimum**
 
-Returns the smaller value of the inputs.
+Returns the smaller of the two inputs.
 ```
 min(left, right)
 minimum(left, right)
@@ -113,7 +113,7 @@ minimum(left, right)
 
 **Maximum**
 
-Returns the larger value of the inputs.
+Returns the larger of the two inputs.
 ```
 max(left, right)
 maximum(left, right)
@@ -121,10 +121,11 @@ maximum(left, right)
 
 ### Rounding
 
-All rounding functions will assume you are trying to round the the relevant integer value, but you can customize the result. All rounding functions accept a precision as an integer value that will determine how many decimals to include. Additionally, `ceil`, `floor`, and `round` can instead accept a stepping value as a floating point value and will round to relevant multiple of that stepping.
+All rounding functions assume you are trying to round the the relevant integer value, but you can customize that somewhat. All rounding functions accept a precision as an integer value that will determine how many decimals to include. Additionally, `ceil`, `floor`, and `round` can instead accept a stepping value as a floating point value and will round to relevant multiple of that stepping.
 
 **Ceil**
 
+Rounds up to the nearest value that conforms to the precision/stepping.
 ```
 ceil(value)
 ceil(value, precision)
@@ -137,6 +138,7 @@ ceil(1, 2.4)    | 2.4       # Ceil with stepping
 
 **Floor**
 
+Rounds down to the nearest value that conforms to the precision/stepping.
 ```
 floor(value)
 floor(value, precision)
@@ -149,6 +151,7 @@ floor(4.7, 2.4)  | 2.4       # Floor with stepping
 
 **Round**
 
+Rounds away from 0 to the nearest value that conforms to the precision/stepping.
 ```
 round(value)
 round(value, precision)
@@ -164,6 +167,7 @@ round(4.7, 2.4)  | 2.4       # Round with stepping
 
 **Trunc**
 
+Removes unwanted decimals.
 ```
 trunc(value)
 trunc(value, precision)
@@ -285,7 +289,7 @@ cube_root(arg)
 
 **Factorial**
 
-Computes the factorial of a number. The argument has to be a positive integer and cannot be larger than 20, as it would otherwise exceed the size of a signed 64-bit integer.
+Computes the factorial of a number. The argument has to be a positive integer and cannot be larger than 20, as the result would otherwise exceed the size of a signed 64-bit integer.
 ```
 fact(arg)
 factorial(arg)

@@ -4,22 +4,18 @@ use super::validate_and_wrap;
 use crate::errors::{ComputeError, ComputeResult};
 
 pub fn sqrt(value: Literal) -> ComputeResult<Option<Literal>> {
-    let raw = match value {
-        Literal::Integer(value) => value as f64,
-        Literal::Float(value) => value,
-    };
+    let raw = value.as_f64();
     if raw < 0.0 {
         Err(ComputeError::InvalidSquareRoot(value))
     } else {
-        Ok(validate_and_wrap(raw.sqrt()))
+        let root = raw.sqrt();
+        Ok(validate_and_wrap(root))
     }
 }
 
 pub fn cbrt(value: Literal) -> Option<Literal> {
-    let root = match value {
-        Literal::Integer(value) => (value as f64).cbrt(),
-        Literal::Float(value) => value.cbrt(),
-    };
+    let value = value.as_f64();
+    let root = value.cbrt();
     validate_and_wrap(root)
 }
 
@@ -41,47 +37,32 @@ pub fn factorial(value: Literal) -> ComputeResult<Option<Literal>> {
 }
 
 pub fn log(value: Literal, base: Literal) -> Option<Literal> {
-    let b = match base {
-        Literal::Integer(i) => i as f64,
-        Literal::Float(f) => f,
-    };
+    let b = base.as_f64();
     if b == 2.0 {
         log2(value)
     } else if b == 10.0 {
         log10(value)
     } else {
-        let v = match value {
-            Literal::Integer(i) => i as f64,
-            Literal::Float(f) => f,
-        };
+        let v = value.as_f64();
         let result = v.log(b);
         validate_and_wrap(result)
     }
 }
 
 pub fn log2(value: Literal) -> Option<Literal> {
-    let v = match value {
-        Literal::Integer(i) => i as f64,
-        Literal::Float(f) => f,
-    };
+    let v = value.as_f64();
     let result = v.log2();
     validate_and_wrap(result)
 }
 
 pub fn log10(value: Literal) -> Option<Literal> {
-    let v = match value {
-        Literal::Integer(i) => i as f64,
-        Literal::Float(f) => f,
-    };
+    let v = value.as_f64();
     let result = v.log10();
     validate_and_wrap(result)
 }
 
 pub fn ln(value: Literal) -> Option<Literal> {
-    let v = match value {
-        Literal::Integer(i) => i as f64,
-        Literal::Float(f) => f,
-    };
+    let v = value.as_f64();
     let result = v.ln();
     validate_and_wrap(result)
 }
