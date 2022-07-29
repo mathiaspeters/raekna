@@ -1,6 +1,6 @@
 [package]
 name = "raekna"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Mathias Peters"]
 edition = "2021"
 description = "This crate combines the other crates in the workspace to make a functional program."
@@ -9,10 +9,10 @@ repository = "https://github.com/mathiaspeters/raekna"
 
 [dependencies]
 raekna-common  = "0.2"
-raekna-compute = "0.1"
-raekna-parser  = "0.1"
-raekna-storage = "0.1"
-raekna-ui      = "0.1"
+raekna-compute = "0.2"
+raekna-parser  = "0.2"
+raekna-storage = "0.2"
+raekna-ui      = "0.2"
 
 [dev-dependencies]
 criterion = "0.3"

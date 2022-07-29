@@ -1,6 +1,6 @@
 [package]
 name = "raekna-parser"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Mathias Peters"]
 edition = "2021"
 description = "This crate provides the code needed to parse string slices into Expressions that can later be evaluated."

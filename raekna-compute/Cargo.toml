@@ -1,6 +1,6 @@
 [package]
 name = "raekna-compute"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Mathias Peters"]
 edition = "2021"
 description = "This crate allows evaluating expressions into literals."
