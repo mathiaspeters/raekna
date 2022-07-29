@@ -13,10 +13,3 @@ resolver = "2"
 # Disabling debug info speeds up builds a bunch,
 # and we don't rely on it for debugging that much.
 debug = 0
-
-[patch.crates-io]
-raekna-common = { path = "raekna-common" }
-raekna-compute = { path = "raekna-compute" }
-raekna-parser = { path = "raekna-parser" }
-raekna-storage = { path = "raekna-storage" }
-raekna-ui = { path = "raekna-ui" }
