@@ -1,6 +1,6 @@
 [package]
 name = "raekna-common"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Mathias Peters"]
 edition = "2021"
 description = "This crate contains common types and functionality for the raekna project."
