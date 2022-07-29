@@ -1378,10 +1378,10 @@ version = "0.2.0"
 dependencies = [
  "criterion",
  "raekna-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "raekna-compute",
- "raekna-parser",
- "raekna-storage",
- "raekna-ui",
+ "raekna-compute 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-parser 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-storage 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raekna-ui 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1403,8 +1403,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "raekna-compute"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2271aec20d9bf20ecd4790ae9e2a45220f2a73f6530b409938b4ca86a18ff11"
+dependencies = [
+ "raekna-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "raekna-parser"
 version = "0.2.0"
+dependencies = [
+ "nom",
+ "raekna-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "raekna-parser"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "804ad2205749a2dea36a35d179c61b5b64bb3e6a7e0ba4946aa743b1c7e03625"
 dependencies = [
  "nom",
  "raekna-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1418,8 +1437,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "raekna-storage"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9c0fb8e88fca67e5838aa1579acf831b489323f9b86c3a95063464fdcd3803c"
+dependencies = [
+ "raekna-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "raekna-ui"
 version = "0.2.0"
+dependencies = [
+ "bytemuck",
+ "copypasta",
+ "env_logger",
+ "futures-lite",
+ "log",
+ "raekna-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wgpu",
+ "wgpu_glyph",
+ "winit",
+]
+
+[[package]]
+name = "raekna-ui"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "120173cefada0e988d79beb2d4e670b6ded8902d37bf385546a646729a94a759"
 dependencies = [
  "bytemuck",
  "copypasta",
