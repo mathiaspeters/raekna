@@ -37,4 +37,8 @@ impl RCalculator for Calculator {
     fn get_selection(&self, selection_start: EditPosition, selection_end: EditPosition) -> String {
         self.storage.get_selection(selection_start, selection_end)
     }
+
+    fn get_word_boundaries(&self, origin: EditPosition) -> Option<(EditPosition, EditPosition)> {
+        self.storage.get_word_boundaries(origin)
+    }
 }

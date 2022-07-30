@@ -9,6 +9,7 @@ pub trait RCalculator {
     fn get_line(&self, index: usize) -> CommonResult<(&str, &str)>;
     fn update_line(&mut self, actions: Vec<EditAction>);
     fn get_selection(&self, selection_start: EditPosition, selection_end: EditPosition) -> String;
+    fn get_word_boundaries(&self, origin: EditPosition) -> Option<(EditPosition, EditPosition)>;
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
