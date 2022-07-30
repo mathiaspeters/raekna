@@ -11,7 +11,7 @@ pub trait RCalculator {
     fn get_selection(&self, selection_start: EditPosition, selection_end: EditPosition) -> String;
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct EditPosition {
     pub line: usize,
     pub column: usize,
