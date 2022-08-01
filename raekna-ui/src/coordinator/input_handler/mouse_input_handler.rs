@@ -229,16 +229,8 @@ impl MouseInputHandler {
                                     if active_modifiers.shift {
                                         todo!()
                                     } else {
-                                        self.selection.0 = CaretPosition {
-                                            line: boundary_start.line,
-                                            column: boundary_start.column,
-                                            actual_column: boundary_start.column,
-                                        };
-                                        self.selection.1 = Some(CaretPosition {
-                                            line: boundary_end.line,
-                                            column: boundary_end.column,
-                                            actual_column: boundary_end.column,
-                                        });
+                                        self.selection.0 = boundary_start.into();
+                                        self.selection.1 = Some(boundary_end.into());
                                     }
                                 }
                                 None => {

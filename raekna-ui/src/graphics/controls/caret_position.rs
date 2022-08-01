@@ -1,3 +1,5 @@
+use raekna_common::EditPosition;
+
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct CaretPosition {
     pub line: usize,
@@ -135,6 +137,25 @@ impl CaretPosition {
             self.column = line_widths[self.line];
             self.actual_column = self.column;
             true
+        }
+    }
+}
+
+impl From<CaretPosition> for EditPosition {
+    fn from(cp: CaretPosition) -> Self {
+        Self {
+            line: cp.line,
+            column: cp.column,
+        }
+    }
+}
+
+impl From<EditPosition> for CaretPosition {
+    fn from(ep: EditPosition) -> Self {
+        Self {
+            line: ep.line,
+            column: ep.column,
+            actual_column: ep.column,
         }
     }
 }
