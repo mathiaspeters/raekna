@@ -9,7 +9,11 @@ pub trait RCalculator {
     fn get_line(&self, index: usize) -> CommonResult<(&str, &str)>;
     fn update_line(&mut self, actions: Vec<EditAction>);
     fn get_selection(&self, selection_start: EditPosition, selection_end: EditPosition) -> String;
-    fn get_word_boundaries(&self, origin: EditPosition) -> Option<(EditPosition, EditPosition)>;
+    fn get_word_boundaries(
+        &self,
+        origin: EditPosition,
+        priority: BoundaryPriority,
+    ) -> Option<(EditPosition, EditPosition)>;
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -22,6 +26,13 @@ impl EditPosition {
     pub fn new(line: usize, column: usize) -> Self {
         Self { line, column }
     }
+}
+
+#[derive(Copy, Clone)]
+pub enum BoundaryPriority {
+    None,
+    Left,
+    Right,
 }
 
 #[derive(Clone, Debug)]

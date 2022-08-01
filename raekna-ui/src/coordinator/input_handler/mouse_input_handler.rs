@@ -1,4 +1,4 @@
-use raekna_common::EditPosition;
+use raekna_common::{BoundaryPriority, EditPosition};
 use winit::{
     dpi::PhysicalPosition,
     event::{ElementState, MouseButton},
@@ -222,8 +222,9 @@ impl MouseInputHandler {
                             let clicked_position = self.get_line_and_column(dimensions);
                             let clicked_position =
                                 EditPosition::new(clicked_position.line, clicked_position.column);
-                            let word_boundaries =
-                                content.calculator.get_word_boundaries(clicked_position);
+                            let word_boundaries = content
+                                .calculator
+                                .get_word_boundaries(clicked_position, BoundaryPriority::None);
                             match word_boundaries {
                                 Some((boundary_start, boundary_end)) => {
                                     if active_modifiers.shift {

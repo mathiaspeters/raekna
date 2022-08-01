@@ -1,3 +1,5 @@
+use raekna_common::BoundaryPriority;
+
 use crate::{
     coordinator::{
         active_modifiers::ActiveModifiers, content::Content, dimensions::Dimensions,
@@ -45,10 +47,10 @@ impl KeyboardMovementHandler {
                 Some(root) if !active_modifiers.shift => {
                     let (start, _) = get_ordered_selection(root, content.caret_position);
                     if active_modifiers.ctrl {
-                        match content
-                            .calculator
-                            .get_word_boundaries(content.caret_position.into())
-                        {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Left,
+                        ) {
                             Some((boundary, _)) => content
                                 .caret_position
                                 .set_position(boundary.line, boundary.column),
@@ -64,10 +66,10 @@ impl KeyboardMovementHandler {
                 }
                 _ => {
                     if active_modifiers.ctrl {
-                        match content
-                            .calculator
-                            .get_word_boundaries(content.caret_position.into())
-                        {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Left,
+                        ) {
                             Some((boundary, _)) => content
                                 .caret_position
                                 .set_position(boundary.line, boundary.column),
@@ -84,10 +86,10 @@ impl KeyboardMovementHandler {
                 Some(root) if !active_modifiers.shift => {
                     let (_, end) = get_ordered_selection(root, content.caret_position);
                     if active_modifiers.ctrl {
-                        match content
-                            .calculator
-                            .get_word_boundaries(content.caret_position.into())
-                        {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Right,
+                        ) {
                             Some((_, boundary)) => content
                                 .caret_position
                                 .set_position(boundary.line, boundary.column),
@@ -99,10 +101,10 @@ impl KeyboardMovementHandler {
                 }
                 _ => {
                     if active_modifiers.ctrl {
-                        match content
-                            .calculator
-                            .get_word_boundaries(content.caret_position.into())
-                        {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Right,
+                        ) {
                             Some((_, boundary)) => content
                                 .caret_position
                                 .set_position(boundary.line, boundary.column),

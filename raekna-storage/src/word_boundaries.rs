@@ -1,3 +1,5 @@
+use raekna_common::BoundaryPriority;
+
 /// Returns the indices of the word boundaries from an origin point.
 ///
 /// There are three classes of characters that create words when the appear in sequence:
@@ -11,12 +13,16 @@
 /// `abc   ,.-de_f`
 ///
 /// This function does no specific handling of newlines since for the use case strings cannot have newlines.
-pub fn find_word_boundaries(input: &str, origin: usize) -> Option<(usize, usize)> {
+pub fn find_word_boundaries(
+    input: &str,
+    origin: usize,
+    priority: BoundaryPriority,
+) -> Option<(usize, usize)> {
     if input.is_empty() || origin > input.len() {
         return None;
     }
     let sequences = generate_sequences(input);
-    find_sequence(&sequences, origin).map(CharSequence::boundaries)
+    find_sequence(&sequences, origin, priority).map(CharSequence::boundaries)
 }
 
 fn generate_sequences(input: &str) -> Vec<CharSequence> {
@@ -34,19 +40,37 @@ fn generate_sequences(input: &str) -> Vec<CharSequence> {
     sequences.finish()
 }
 
-fn find_sequence(sequences: &[CharSequence], origin: usize) -> Option<CharSequence> {
+fn find_sequence(
+    sequences: &[CharSequence],
+    origin: usize,
+    priority: BoundaryPriority,
+) -> Option<CharSequence> {
     let mut seq = None;
     for cs in sequences.iter() {
         if cs.start > origin {
             break;
         } else if cs.start <= origin && cs.end >= origin {
-            match (cs.seq_type, seq.map(|cs: CharSequence| cs.seq_type)) {
-                (SequenceType::Word, Some(SequenceType::Whitespace | SequenceType::Other))
-                | (SequenceType::Whitespace, Some(SequenceType::Other))
-                | (_, None) => {
+            match priority {
+                BoundaryPriority::None => {
+                    match (cs.seq_type, seq.map(|cs: CharSequence| cs.seq_type)) {
+                        (
+                            SequenceType::Word,
+                            Some(SequenceType::Whitespace | SequenceType::Other),
+                        )
+                        | (SequenceType::Whitespace, Some(SequenceType::Other))
+                        | (_, None) => {
+                            seq = Some(*cs);
+                        }
+                        _ => {}
+                    }
+                }
+                BoundaryPriority::Left => {
+                    seq = Some(*cs);
+                    break;
+                }
+                BoundaryPriority::Right => {
                     seq = Some(*cs);
                 }
-                _ => {}
             }
         }
     }
@@ -111,13 +135,13 @@ mod tests {
 
     #[test]
     fn test_empty_input() {
-        let actual = find_word_boundaries("", 0);
+        let actual = find_word_boundaries("", 0, BoundaryPriority::None);
         assert_eq!(actual, None);
     }
 
     #[test]
     fn test_origin_out_of_bounds() {
-        let actual = find_word_boundaries("abc", 4);
+        let actual = find_word_boundaries("abc", 4, BoundaryPriority::None);
         assert_eq!(actual, None);
     }
 
@@ -127,7 +151,7 @@ mod tests {
         #[test]
         fn test_origin_at_start() {
             ["abc", "   ", "..."].iter().for_each(|input| {
-                let actual = find_word_boundaries(input, 0);
+                let actual = find_word_boundaries(input, 0, BoundaryPriority::None);
                 let expected = Some((0, 3));
                 assert_eq!(actual, expected);
             });
@@ -136,7 +160,7 @@ mod tests {
         #[test]
         fn test_origin_at_end() {
             ["abc", "   ", "..."].iter().for_each(|input| {
-                let actual = find_word_boundaries(input, 3);
+                let actual = find_word_boundaries(input, 3, BoundaryPriority::None);
                 let expected = Some((0, 3));
                 assert_eq!(actual, expected);
             });
@@ -145,7 +169,7 @@ mod tests {
         #[test]
         fn test_origin_inside() {
             ["abc", "   ", "..."].iter().for_each(|input| {
-                let actual = find_word_boundaries(input, 2);
+                let actual = find_word_boundaries(input, 2, BoundaryPriority::None);
                 let expected = Some((0, 3));
                 assert_eq!(actual, expected);
             });
@@ -157,29 +181,29 @@ mod tests {
 
         #[test]
         fn test_origin_at_start() {
-            let actual = find_word_boundaries("abcdef   ...", 0);
+            let actual = find_word_boundaries("abcdef   ...", 0, BoundaryPriority::None);
             let expected = Some((0, 6));
             assert_eq!(actual, expected);
         }
 
         #[test]
         fn test_origin_at_end() {
-            let actual = find_word_boundaries("abcd     ,...", 13);
+            let actual = find_word_boundaries("abcd     ,...", 13, BoundaryPriority::None);
             let expected = Some((9, 13));
             assert_eq!(actual, expected);
         }
 
         #[test]
         fn test_origin_inside() {
-            let actual = find_word_boundaries("abcde   ,..", 2);
+            let actual = find_word_boundaries("abcde   ,..", 2, BoundaryPriority::None);
             let expected = Some((0, 5));
             assert_eq!(actual, expected);
 
-            let actual = find_word_boundaries("abcde   ,..", 6);
+            let actual = find_word_boundaries("abcde   ,..", 6, BoundaryPriority::None);
             let expected = Some((5, 8));
             assert_eq!(actual, expected);
 
-            let actual = find_word_boundaries("abcde   ,..", 10);
+            let actual = find_word_boundaries("abcde   ,..", 10, BoundaryPriority::None);
             let expected = Some((8, 11));
             assert_eq!(actual, expected);
         }
@@ -190,34 +214,68 @@ mod tests {
 
         #[test]
         fn test_word_and_whitespace() {
-            let actual = find_word_boundaries("abc   def", 3);
+            let actual = find_word_boundaries("abc   def", 3, BoundaryPriority::None);
             let expected = Some((0, 3));
             assert_eq!(actual, expected);
 
-            let actual = find_word_boundaries("abc   def", 6);
+            let actual = find_word_boundaries("abc   def", 6, BoundaryPriority::None);
             let expected = Some((6, 9));
             assert_eq!(actual, expected);
         }
 
         #[test]
         fn test_word_and_other() {
-            let actual = find_word_boundaries("abc...def", 3);
+            let actual = find_word_boundaries("abc...def", 3, BoundaryPriority::None);
             let expected = Some((0, 3));
             assert_eq!(actual, expected);
 
-            let actual = find_word_boundaries("abc...def", 6);
+            let actual = find_word_boundaries("abc...def", 6, BoundaryPriority::None);
             let expected = Some((6, 9));
             assert_eq!(actual, expected);
         }
 
         #[test]
         fn test_whitespace_and_other() {
-            let actual = find_word_boundaries("   ...   ", 3);
+            let actual = find_word_boundaries("   ...   ", 3, BoundaryPriority::None);
             let expected = Some((0, 3));
             assert_eq!(actual, expected);
 
-            let actual = find_word_boundaries("   ...   ", 6);
+            let actual = find_word_boundaries("   ...   ", 6, BoundaryPriority::None);
             let expected = Some((6, 9));
+            assert_eq!(actual, expected);
+        }
+    }
+
+    mod test_priority {
+        use super::*;
+
+        #[test]
+        fn test_left_priority() {
+            let actual = find_word_boundaries("   abc", 3, BoundaryPriority::Left);
+            let expected = Some((0, 3));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("...abc", 3, BoundaryPriority::Left);
+            let expected = Some((0, 3));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("...   ", 3, BoundaryPriority::Left);
+            let expected = Some((0, 3));
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn test_right_priority() {
+            let actual = find_word_boundaries("abc   ", 3, BoundaryPriority::Right);
+            let expected = Some((3, 6));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("abc...", 3, BoundaryPriority::Right);
+            let expected = Some((3, 6));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("   ...", 3, BoundaryPriority::Right);
+            let expected = Some((3, 6));
             assert_eq!(actual, expected);
         }
     }

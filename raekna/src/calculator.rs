@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use raekna_common::{errors::CommonResult, EditAction, EditPosition, RCalculator};
+use raekna_common::{
+    errors::CommonResult, BoundaryPriority, EditAction, EditPosition, RCalculator,
+};
 use raekna_compute::evaluate;
 use raekna_parser::parse;
 use raekna_storage::storage::Storage;
@@ -38,7 +40,11 @@ impl RCalculator for Calculator {
         self.storage.get_selection(selection_start, selection_end)
     }
 
-    fn get_word_boundaries(&self, origin: EditPosition) -> Option<(EditPosition, EditPosition)> {
-        self.storage.get_word_boundaries(origin)
+    fn get_word_boundaries(
+        &self,
+        origin: EditPosition,
+        priority: BoundaryPriority,
+    ) -> Option<(EditPosition, EditPosition)> {
+        self.storage.get_word_boundaries(origin, priority)
     }
 }
