@@ -1,3 +1,4 @@
+use raekna_common::EditPosition;
 use winit::{
     dpi::PhysicalPosition,
     event::{ElementState, MouseButton},
@@ -218,7 +219,39 @@ impl MouseInputHandler {
                             };
                             self.set_selection(self.selection.0, selection_end);
                         } else if click_count == 2 {
-                            // select word
+                            let clicked_position = self.get_line_and_column(dimensions);
+                            let clicked_position =
+                                EditPosition::new(clicked_position.line, clicked_position.column);
+                            let word_boundaries =
+                                content.calculator.get_word_boundaries(clicked_position);
+                            match word_boundaries {
+                                Some((boundary_start, boundary_end)) => {
+                                    if active_modifiers.shift {
+                                        todo!()
+                                    } else {
+                                        self.selection.0 = CaretPosition {
+                                            line: boundary_start.line,
+                                            column: boundary_start.column,
+                                            actual_column: boundary_start.column,
+                                        };
+                                        self.selection.1 = Some(CaretPosition {
+                                            line: boundary_end.line,
+                                            column: boundary_end.column,
+                                            actual_column: boundary_end.column,
+                                        });
+                                    }
+                                }
+                                None => {
+                                    self.mouse_click_position =
+                                        self.get_line_and_column(dimensions);
+                                    let mut clicked_position = self.mouse_click_position;
+                                    self.normalize_caret_position(
+                                        &mut clicked_position,
+                                        line_widths,
+                                    );
+                                    self.selection = (clicked_position, None);
+                                }
+                            }
                         } else if active_modifiers.shift {
                             self.mouse_click_position = content.caret_position;
                             let mut clicked_position = self.get_line_and_column(dimensions);
