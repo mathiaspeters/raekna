@@ -62,10 +62,18 @@ impl KeyboardMovementHandler {
                 }
             },
             KeyboardMovement::Home => {
-                content.caret_position.home();
+                if active_modifiers.ctrl {
+                    content.caret_position.page_up();
+                } else {
+                    content.caret_position.home();
+                }
             }
             KeyboardMovement::End => {
-                content.caret_position.end(line_widths);
+                if active_modifiers.ctrl {
+                    content.caret_position.page_down(line_widths);
+                } else {
+                    content.caret_position.end(line_widths);
+                }
             }
             KeyboardMovement::PageUp => {
                 content.caret_position.page_up();
