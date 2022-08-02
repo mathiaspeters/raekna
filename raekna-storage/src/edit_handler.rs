@@ -89,7 +89,7 @@ impl<'a> EditHandler<'a> {
             Some(end) => {
                 if start.line == end.line {
                     let end_str = self
-                        .line_at(start.line, |s| s.to_owned())
+                        .line_at(start.line, |s| s[end.column..].to_owned())
                         .unwrap_or_else(|| "".to_owned());
                     self.line_at(start.line, |s| s.replace_range(start.column.., &end_str));
                 } else {
