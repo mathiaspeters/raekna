@@ -54,3 +54,102 @@ impl Storage {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod test_handle_actions {
+        use super::*;
+
+        #[test]
+        fn single_addition() {
+            let mut sut = Storage::default();
+
+            let actions = vec![EditAction::Insert(EditPosition::new(0, 0), 'a')];
+            sut.handle_actions(actions);
+
+            assert_eq!(sut.lines.content, vec!["a".to_owned()]);
+        }
+
+        #[test]
+        fn multiple_additions() {
+            let mut sut = Storage::default();
+
+            let actions = vec![
+                EditAction::Insert(EditPosition::new(0, 0), 'a'),
+                EditAction::InsertMultiple(EditPosition::new(0, 1), "bc".to_owned()),
+                EditAction::NewLine(EditPosition::new(0, 2)),
+                EditAction::InsertMultiple(EditPosition::new(1, 1), "d".to_owned()),
+                EditAction::NewLine(EditPosition::new(1, 2)),
+                EditAction::InsertMultiple(EditPosition::new(2, 0), "ef".to_owned()),
+                EditAction::Insert(EditPosition::new(2, 2), 'g'),
+            ];
+            sut.handle_actions(actions);
+
+            assert_eq!(
+                sut.lines.content,
+                vec!["ab".to_owned(), "cd".to_owned(), "efg".to_owned()]
+            );
+        }
+
+        #[test]
+        fn insert_and_delete() {
+            let mut sut = Storage {
+                lines: Lines {
+                    content: vec!["abc".to_owned()],
+                    results: vec!["".to_owned()],
+                },
+            };
+
+            let actions = vec![EditAction::Delete {
+                selection_start: EditPosition::new(0, 1),
+                selection_end: None,
+            }];
+            sut.handle_actions(actions);
+
+            assert_eq!(sut.lines.content, vec!["bc".to_owned()]);
+
+            let actions = vec![EditAction::DeleteForward(EditPosition::new(0, 0))];
+            sut.handle_actions(actions);
+
+            assert_eq!(sut.lines.content, vec!["c".to_owned()]);
+        }
+
+        #[test]
+        fn delete_single_line_selection() {
+            let mut sut = Storage {
+                lines: Lines {
+                    content: vec!["abcd".to_owned()],
+                    results: vec!["".to_owned()],
+                },
+            };
+
+            let actions = vec![EditAction::Delete {
+                selection_start: EditPosition::new(0, 1),
+                selection_end: Some(EditPosition::new(0, 3)),
+            }];
+            sut.handle_actions(actions);
+
+            assert_eq!(sut.lines.content, vec!["ad".to_owned()]);
+        }
+
+        #[test]
+        fn delete_multi_line_selection() {
+            let mut sut = Storage {
+                lines: Lines {
+                    content: vec!["abc".to_owned(), "def".to_owned()],
+                    results: vec!["".to_owned(), "".to_owned()],
+                },
+            };
+
+            let actions = vec![EditAction::Delete {
+                selection_start: EditPosition::new(0, 2),
+                selection_end: Some(EditPosition::new(1, 2)),
+            }];
+            sut.handle_actions(actions);
+
+            assert_eq!(sut.lines.content, vec!["abf".to_owned()]);
+        }
+    }
+}
