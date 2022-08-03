@@ -111,7 +111,7 @@ impl Sequences {
 
     pub fn increment(&mut self, ctype: SequenceType, index: usize) {
         let last_seq_index = self.seq.len().saturating_sub(1);
-        if self.seq.len() > 0 && ctype == self.seq[last_seq_index].seq_type {
+        if !self.seq.is_empty() && ctype == self.seq[last_seq_index].seq_type {
             let mut sequence = &mut self.seq[last_seq_index];
             sequence.end += 1
         } else {

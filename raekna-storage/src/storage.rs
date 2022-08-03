@@ -73,46 +73,6 @@ impl Storage {
 mod tests {
     use super::*;
 
-    mod test_get_word_boundaries {
-        use super::*;
-
-        #[test]
-        fn origin_line_out_of_bounds() {
-            let lines = Lines {
-                content: vec!["abc".to_owned(), "def".to_owned(), "ghi".to_owned()],
-                results: vec![],
-            };
-            let storage = Storage { lines };
-
-            let origin = EditPosition::new(3, 2);
-            let actual = storage.get_word_boundaries(origin, BoundaryPriority::None);
-
-            assert_eq!(actual, None);
-        }
-
-        #[test]
-        fn normal_usage() {
-            let lines = Lines {
-                content: vec!["abc".to_owned(), "def".to_owned(), "ghi".to_owned()],
-                results: vec![],
-            };
-            let storage = Storage { lines };
-
-            let origin = EditPosition::new(1, 2);
-            let actual = storage.get_word_boundaries(origin, BoundaryPriority::None);
-
-            let expected = (EditPosition::new(1, 0), EditPosition::new(1, 3));
-            let expected = Some(expected);
-
-            assert_eq!(actual, expected);
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
     mod test_handle_actions {
         use super::*;
 
@@ -204,6 +164,41 @@ mod tests {
             sut.handle_actions(actions);
 
             assert_eq!(sut.lines.content, vec!["abf".to_owned()]);
+        }
+    }
+
+    mod test_get_word_boundaries {
+        use super::*;
+
+        #[test]
+        fn origin_line_out_of_bounds() {
+            let lines = Lines {
+                content: vec!["abc".to_owned(), "def".to_owned(), "ghi".to_owned()],
+                results: vec![],
+            };
+            let storage = Storage { lines };
+
+            let origin = EditPosition::new(3, 2);
+            let actual = storage.get_word_boundaries(origin, BoundaryPriority::None);
+
+            assert_eq!(actual, None);
+        }
+
+        #[test]
+        fn normal_usage() {
+            let lines = Lines {
+                content: vec!["abc".to_owned(), "def".to_owned(), "ghi".to_owned()],
+                results: vec![],
+            };
+            let storage = Storage { lines };
+
+            let origin = EditPosition::new(1, 2);
+            let actual = storage.get_word_boundaries(origin, BoundaryPriority::None);
+
+            let expected = (EditPosition::new(1, 0), EditPosition::new(1, 3));
+            let expected = Some(expected);
+
+            assert_eq!(actual, expected);
         }
     }
 }
