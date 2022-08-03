@@ -157,15 +157,21 @@ impl KeyboardEditHandler {
                         }
                     }
                 };
-
                 let before = widths_before.len();
                 Self::maybe_hide_selection(content, selection_start.line, selection_start.column);
                 Self::perform_action(content, actions, dimensions);
                 let after = content.text_buffer.line_widths().len();
                 if selection_end.is_none() && before == after {
-                    content
-                        .caret_position
-                        .move_left(content.text_buffer.line_widths());
+                    if active_modifiers.ctrl {
+                        let line = content.caret_position.line;
+                        content
+                            .caret_position
+                            .set_position(line, potential_column_after);
+                    } else {
+                        content
+                            .caret_position
+                            .move_left(content.text_buffer.line_widths());
+                    }
                 } else if selection_end.is_none() {
                     let line = content.caret_position.line;
                     content
