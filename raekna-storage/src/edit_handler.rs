@@ -87,6 +87,7 @@ impl<'a> EditHandler<'a> {
                 }
             }
             Some(end) => {
+                // TODO: Fix
                 if start.line == end.line {
                     let end_str = self
                         .line_at(start.line, |s| s[end.column..].to_owned())

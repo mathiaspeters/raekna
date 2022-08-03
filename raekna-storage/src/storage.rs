@@ -1,9 +1,9 @@
 use raekna_common::{
     errors::{CommonError, CommonResult},
-    EditAction, EditPosition,
+    BoundaryPriority, EditAction, EditPosition,
 };
 
-use crate::{edit_handler::EditHandler, lines::Lines};
+use crate::{edit_handler::EditHandler, lines::Lines, word_boundaries::find_word_boundaries};
 
 #[derive(Debug, Default)]
 pub struct Storage {
@@ -51,6 +51,20 @@ impl Storage {
             }
             lines.push(&self.lines[selection_end.line][..selection_end.column]);
             lines.join("\n")
+        }
+    }
+
+    pub fn get_word_boundaries(
+        &self,
+        origin: EditPosition,
+        priority: BoundaryPriority,
+    ) -> Option<(EditPosition, EditPosition)> {
+        let EditPosition { line, column } = origin;
+        if line >= self.lines.len() {
+            None
+        } else {
+            find_word_boundaries(&self.lines[line], column, priority)
+                .map(|(start, end)| (EditPosition::new(line, start), EditPosition::new(line, end)))
         }
     }
 }
@@ -150,6 +164,41 @@ mod tests {
             sut.handle_actions(actions);
 
             assert_eq!(sut.lines.content, vec!["abf".to_owned()]);
+        }
+    }
+
+    mod test_get_word_boundaries {
+        use super::*;
+
+        #[test]
+        fn origin_line_out_of_bounds() {
+            let lines = Lines {
+                content: vec!["abc".to_owned(), "def".to_owned(), "ghi".to_owned()],
+                results: vec![],
+            };
+            let storage = Storage { lines };
+
+            let origin = EditPosition::new(3, 2);
+            let actual = storage.get_word_boundaries(origin, BoundaryPriority::None);
+
+            assert_eq!(actual, None);
+        }
+
+        #[test]
+        fn normal_usage() {
+            let lines = Lines {
+                content: vec!["abc".to_owned(), "def".to_owned(), "ghi".to_owned()],
+                results: vec![],
+            };
+            let storage = Storage { lines };
+
+            let origin = EditPosition::new(1, 2);
+            let actual = storage.get_word_boundaries(origin, BoundaryPriority::None);
+
+            let expected = (EditPosition::new(1, 0), EditPosition::new(1, 3));
+            let expected = Some(expected);
+
+            assert_eq!(actual, expected);
         }
     }
 }

@@ -1,3 +1,5 @@
+use raekna_common::BoundaryPriority;
+
 use crate::{
     coordinator::{
         active_modifiers::ActiveModifiers, content::Content, dimensions::Dimensions,
@@ -44,28 +46,90 @@ impl KeyboardMovementHandler {
             KeyboardMovement::Left => match content.root_position {
                 Some(root) if !active_modifiers.shift => {
                     let (start, _) = get_ordered_selection(root, content.caret_position);
-                    content
-                        .caret_position
-                        .set_position(start.line, start.column);
+                    if active_modifiers.ctrl {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Left,
+                        ) {
+                            Some((boundary, _)) => content
+                                .caret_position
+                                .set_position(boundary.line, boundary.column),
+                            None => content
+                                .caret_position
+                                .set_position(start.line, start.column),
+                        }
+                    } else {
+                        content
+                            .caret_position
+                            .set_position(start.line, start.column);
+                    }
                 }
                 _ => {
-                    content.caret_position.move_left(line_widths);
+                    if active_modifiers.ctrl {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Left,
+                        ) {
+                            Some((boundary, _)) => content
+                                .caret_position
+                                .set_position(boundary.line, boundary.column),
+                            None => {
+                                content.caret_position.move_left(line_widths);
+                            }
+                        }
+                    } else {
+                        content.caret_position.move_left(line_widths);
+                    }
                 }
             },
             KeyboardMovement::Right => match content.root_position {
                 Some(root) if !active_modifiers.shift => {
                     let (_, end) = get_ordered_selection(root, content.caret_position);
-                    content.caret_position.set_position(end.line, end.column);
+                    if active_modifiers.ctrl {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Right,
+                        ) {
+                            Some((_, boundary)) => content
+                                .caret_position
+                                .set_position(boundary.line, boundary.column),
+                            None => content.caret_position.set_position(end.line, end.column),
+                        }
+                    } else {
+                        content.caret_position.set_position(end.line, end.column);
+                    }
                 }
                 _ => {
-                    content.caret_position.move_right(line_widths);
+                    if active_modifiers.ctrl {
+                        match content.calculator.get_word_boundaries(
+                            content.caret_position.into(),
+                            BoundaryPriority::Right,
+                        ) {
+                            Some((_, boundary)) => content
+                                .caret_position
+                                .set_position(boundary.line, boundary.column),
+                            None => {
+                                content.caret_position.move_right(line_widths);
+                            }
+                        }
+                    } else {
+                        content.caret_position.move_right(line_widths);
+                    }
                 }
             },
             KeyboardMovement::Home => {
-                content.caret_position.home();
+                if active_modifiers.ctrl {
+                    content.caret_position.page_up();
+                } else {
+                    content.caret_position.home();
+                }
             }
             KeyboardMovement::End => {
-                content.caret_position.end(line_widths);
+                if active_modifiers.ctrl {
+                    content.caret_position.page_down(line_widths);
+                } else {
+                    content.caret_position.end(line_widths);
+                }
             }
             KeyboardMovement::PageUp => {
                 content.caret_position.page_up();

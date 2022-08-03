@@ -3,7 +3,10 @@ use raekna_common::{EditAction, EditPosition};
 
 use crate::{
     constants::TEXT_PADDING,
-    coordinator::{content::Content, dimensions::Dimensions, user_input::KeyboardEdit},
+    coordinator::{
+        active_modifiers::ActiveModifiers, content::Content, dimensions::Dimensions,
+        user_input::KeyboardEdit,
+    },
 };
 
 #[derive(Debug, Default)]
@@ -14,6 +17,7 @@ impl KeyboardEditHandler {
         &self,
         content: &mut Content,
         dimensions: &mut Dimensions,
+        active_modifiers: ActiveModifiers,
         edit: KeyboardEdit,
     ) {
         let (selection_start, selection_end) = content.get_edit_selection();
@@ -78,22 +82,41 @@ impl KeyboardEditHandler {
                     Self::delete_selection(content, dimensions, selection_start, selection_end);
                 }
                 None => {
-                    let actions = vec![EditAction::DeleteForward(selection_start)];
-                    Self::maybe_hide_selection(
-                        content,
-                        selection_start.line,
-                        selection_start.column,
-                    );
-                    Self::perform_action(content, actions, dimensions);
+                    if active_modifiers.ctrl {
+                        match content.calculator.get_word_boundaries(
+                            selection_start,
+                            raekna_common::BoundaryPriority::Right,
+                        ) {
+                            Some((_, boundary)) => Self::delete_selection(
+                                content,
+                                dimensions,
+                                selection_start,
+                                boundary,
+                            ),
+                            None => {
+                                let actions = vec![EditAction::DeleteForward(selection_start)];
+                                Self::maybe_hide_selection(
+                                    content,
+                                    selection_start.line,
+                                    selection_start.column,
+                                );
+                                Self::perform_action(content, actions, dimensions);
+                            }
+                        }
+                    } else {
+                        let actions = vec![EditAction::DeleteForward(selection_start)];
+                        Self::maybe_hide_selection(
+                            content,
+                            selection_start.line,
+                            selection_start.column,
+                        );
+                        Self::perform_action(content, actions, dimensions);
+                    }
                 }
             },
             KeyboardEdit::Backspace => {
-                let actions = vec![EditAction::Delete {
-                    selection_start,
-                    selection_end,
-                }];
                 let widths_before = content.text_buffer.line_widths();
-                let potential_column_after = {
+                let mut potential_column_after = {
                     let line = content.caret_position.line;
                     if line > 0 {
                         widths_before[line - 1]
@@ -101,14 +124,54 @@ impl KeyboardEditHandler {
                         widths_before[line]
                     }
                 };
+                let actions = match selection_end {
+                    Some(selection_end) => {
+                        vec![EditAction::Delete {
+                            selection_start,
+                            selection_end: Some(selection_end),
+                        }]
+                    }
+                    None => {
+                        if active_modifiers.ctrl {
+                            match content.calculator.get_word_boundaries(
+                                selection_start,
+                                raekna_common::BoundaryPriority::Left,
+                            ) {
+                                Some((boundary, _)) => {
+                                    potential_column_after = boundary.column;
+                                    vec![EditAction::Delete {
+                                        selection_start: boundary,
+                                        selection_end: Some(selection_start),
+                                    }]
+                                }
+                                None => vec![EditAction::Delete {
+                                    selection_start,
+                                    selection_end,
+                                }],
+                            }
+                        } else {
+                            vec![EditAction::Delete {
+                                selection_start,
+                                selection_end,
+                            }]
+                        }
+                    }
+                };
                 let before = widths_before.len();
                 Self::maybe_hide_selection(content, selection_start.line, selection_start.column);
                 Self::perform_action(content, actions, dimensions);
                 let after = content.text_buffer.line_widths().len();
                 if selection_end.is_none() && before == after {
-                    content
-                        .caret_position
-                        .move_left(content.text_buffer.line_widths());
+                    if active_modifiers.ctrl {
+                        let line = content.caret_position.line;
+                        content
+                            .caret_position
+                            .set_position(line, potential_column_after);
+                    } else {
+                        content
+                            .caret_position
+                            .move_left(content.text_buffer.line_widths());
+                    }
                 } else if selection_end.is_none() {
                     let line = content.caret_position.line;
                     content

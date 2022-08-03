@@ -45,8 +45,12 @@ impl InputHandler {
             }
             UserInput::KeyboardEdit(edit) => {
                 content.controls.set_caret_visible();
-                self.keyboard_edit_handler
-                    .on_keyboard_edit(content, dimensions, edit)
+                self.keyboard_edit_handler.on_keyboard_edit(
+                    content,
+                    dimensions,
+                    self.active_modifiers,
+                    edit,
+                )
             }
             UserInput::MouseInput(input) => {
                 if let MouseInput::MouseClick { .. } = input {
