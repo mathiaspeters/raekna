@@ -28,7 +28,7 @@ impl EditPosition {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum BoundaryPriority {
     None,
     Left,

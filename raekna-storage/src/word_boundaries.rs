@@ -46,7 +46,8 @@ fn find_sequence(
     priority: BoundaryPriority,
 ) -> Option<CharSequence> {
     let mut seq = None;
-    for cs in sequences.iter() {
+    let mut seq_index = None;
+    for (i, cs) in sequences.iter().enumerate() {
         if cs.start > origin {
             break;
         } else if cs.start <= origin && cs.end >= origin {
@@ -66,15 +67,50 @@ fn find_sequence(
                 }
                 BoundaryPriority::Left => {
                     seq = Some(*cs);
+                    seq_index = Some(i);
                     break;
                 }
                 BoundaryPriority::Right => {
                     seq = Some(*cs);
+                    seq_index = Some(i);
                 }
             }
         }
     }
-    seq
+    match seq_index {
+        Some(i) => match priority {
+            BoundaryPriority::Left if i == 0 => seq,
+            BoundaryPriority::Left => {
+                let seq = seq.unwrap();
+                let mut next_seq = sequences[i - 1];
+                let seq = match (seq.seq_type, next_seq.seq_type) {
+                    (SequenceType::Whitespace | SequenceType::Other, SequenceType::Word)
+                    | (SequenceType::Other, SequenceType::Whitespace) => {
+                        next_seq.end += 1;
+                        next_seq
+                    }
+                    _ => seq,
+                };
+                Some(seq)
+            }
+            BoundaryPriority::Right if i == sequences.len() - 1 => seq,
+            BoundaryPriority::Right => {
+                let seq = seq.unwrap();
+                let mut next_seq = sequences[i + 1];
+                let seq = match (seq.seq_type, next_seq.seq_type) {
+                    (SequenceType::Whitespace | SequenceType::Other, SequenceType::Word)
+                    | (SequenceType::Other, SequenceType::Whitespace) => {
+                        next_seq.start -= 1;
+                        next_seq
+                    }
+                    _ => seq,
+                };
+                Some(seq)
+            }
+            BoundaryPriority::None => unreachable!(),
+        },
+        None => seq,
+    }
 }
 
 #[derive(Copy, Clone)]
