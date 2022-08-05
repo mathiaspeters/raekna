@@ -265,6 +265,21 @@ mod tests {
         }
 
         #[test]
+        fn test_left_priority_skips_short_low_prio_sequences() {
+            let actual = find_word_boundaries("abc ", 4, BoundaryPriority::Left);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("abc.", 4, BoundaryPriority::Left);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("   .", 4, BoundaryPriority::Left);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
         fn test_right_priority() {
             let actual = find_word_boundaries("abc   ", 3, BoundaryPriority::Right);
             let expected = Some((3, 6));
@@ -276,6 +291,21 @@ mod tests {
 
             let actual = find_word_boundaries("   ...", 3, BoundaryPriority::Right);
             let expected = Some((3, 6));
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn test_right_priority_skips_short_low_prio_sequences() {
+            let actual = find_word_boundaries(" abc", 0, BoundaryPriority::Right);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries(".abc", 0, BoundaryPriority::Right);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries(".   ", 0, BoundaryPriority::Right);
+            let expected = Some((0, 4));
             assert_eq!(actual, expected);
         }
     }
