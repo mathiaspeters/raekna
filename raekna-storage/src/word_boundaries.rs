@@ -46,7 +46,8 @@ fn find_sequence(
     priority: BoundaryPriority,
 ) -> Option<CharSequence> {
     let mut seq = None;
-    for cs in sequences.iter() {
+    let mut seq_index = None;
+    for (i, cs) in sequences.iter().enumerate() {
         if cs.start > origin {
             break;
         } else if cs.start <= origin && cs.end >= origin {
@@ -66,15 +67,50 @@ fn find_sequence(
                 }
                 BoundaryPriority::Left => {
                     seq = Some(*cs);
+                    seq_index = Some(i);
                     break;
                 }
                 BoundaryPriority::Right => {
                     seq = Some(*cs);
+                    seq_index = Some(i);
                 }
             }
         }
     }
-    seq
+    match seq_index {
+        Some(i) => match priority {
+            BoundaryPriority::Left if i == 0 => seq,
+            BoundaryPriority::Left => {
+                let seq = seq.unwrap();
+                let mut next_seq = sequences[i - 1];
+                let seq = match (seq.seq_type, next_seq.seq_type) {
+                    (SequenceType::Whitespace | SequenceType::Other, SequenceType::Word)
+                    | (SequenceType::Other, SequenceType::Whitespace) => {
+                        next_seq.end += 1;
+                        next_seq
+                    }
+                    _ => seq,
+                };
+                Some(seq)
+            }
+            BoundaryPriority::Right if i == sequences.len() - 1 => seq,
+            BoundaryPriority::Right => {
+                let seq = seq.unwrap();
+                let mut next_seq = sequences[i + 1];
+                let seq = match (seq.seq_type, next_seq.seq_type) {
+                    (SequenceType::Whitespace | SequenceType::Other, SequenceType::Word)
+                    | (SequenceType::Other, SequenceType::Whitespace) => {
+                        next_seq.start -= 1;
+                        next_seq
+                    }
+                    _ => seq,
+                };
+                Some(seq)
+            }
+            BoundaryPriority::None => unreachable!(),
+        },
+        None => seq,
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -265,6 +301,21 @@ mod tests {
         }
 
         #[test]
+        fn test_left_priority_skips_short_low_prio_sequences() {
+            let actual = find_word_boundaries("abc ", 4, BoundaryPriority::Left);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("abc.", 4, BoundaryPriority::Left);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries("   .", 4, BoundaryPriority::Left);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
         fn test_right_priority() {
             let actual = find_word_boundaries("abc   ", 3, BoundaryPriority::Right);
             let expected = Some((3, 6));
@@ -276,6 +327,21 @@ mod tests {
 
             let actual = find_word_boundaries("   ...", 3, BoundaryPriority::Right);
             let expected = Some((3, 6));
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn test_right_priority_skips_short_low_prio_sequences() {
+            let actual = find_word_boundaries(" abc", 0, BoundaryPriority::Right);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries(".abc", 0, BoundaryPriority::Right);
+            let expected = Some((0, 4));
+            assert_eq!(actual, expected);
+
+            let actual = find_word_boundaries(".   ", 0, BoundaryPriority::Right);
+            let expected = Some((0, 4));
             assert_eq!(actual, expected);
         }
     }
