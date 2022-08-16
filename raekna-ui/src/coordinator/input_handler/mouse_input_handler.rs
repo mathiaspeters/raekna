@@ -246,10 +246,13 @@ impl MouseInputHandler {
                                 }
                             }
                         } else if active_modifiers.shift {
-                            self.mouse_click_position = content.caret_position;
+                            self.mouse_click_position = content.selection.caret_position();
                             let mut clicked_position = self.get_line_and_column(dimensions);
                             self.normalize_caret_position(&mut clicked_position, line_widths);
-                            self.set_selection(content.caret_position, clicked_position);
+                            self.set_selection(
+                                content.selection.caret_position(),
+                                clicked_position,
+                            );
                         } else {
                             self.mouse_click_position = self.get_line_and_column(dimensions);
                             let mut clicked_position = self.mouse_click_position;

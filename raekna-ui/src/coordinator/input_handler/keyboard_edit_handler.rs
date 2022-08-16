@@ -7,6 +7,7 @@ use crate::{
         active_modifiers::ActiveModifiers, content::Content, dimensions::Dimensions,
         user_input::KeyboardEdit,
     },
+    graphics::controls::caret_position::CaretPosition,
 };
 
 #[derive(Debug, Default)]
@@ -46,10 +47,12 @@ impl KeyboardEditHandler {
                 };
                 let line_widths = content.text_buffer.line_widths();
                 if selection_end.is_none() {
-                    content.caret_position.move_right(line_widths);
-                    if after > before {
-                        content.caret_position.move_right(line_widths);
-                    }
+                    content.selection.update_position(|cp| {
+                        cp.move_right(line_widths);
+                        if after > before {
+                            cp.move_right(line_widths);
+                        }
+                    });
                 } else {
                     Self::maybe_hide_selection(
                         content,
@@ -69,10 +72,10 @@ impl KeyboardEditHandler {
                 actions.push(EditAction::NewLine(selection_start));
                 Self::perform_action(content, actions, dimensions);
                 if selection_end.is_none() {
-                    content
-                        .caret_position
-                        .move_down(content.text_buffer.line_widths());
-                    content.caret_position.home();
+                    content.selection.update_position(|cp| {
+                        cp.move_down(content.text_buffer.line_widths());
+                        cp.home();
+                    });
                 } else {
                     Self::maybe_hide_selection(content, selection_start.line + 1, 0);
                 }
@@ -117,7 +120,7 @@ impl KeyboardEditHandler {
             KeyboardEdit::Backspace => {
                 let widths_before = content.text_buffer.line_widths();
                 let mut potential_column_after = {
-                    let line = content.caret_position.line;
+                    let line = content.selection.caret_position().line;
                     if line > 0 {
                         widths_before[line - 1]
                     } else {
@@ -161,22 +164,17 @@ impl KeyboardEditHandler {
                 Self::maybe_hide_selection(content, selection_start.line, selection_start.column);
                 Self::perform_action(content, actions, dimensions);
                 let after = content.text_buffer.line_widths().len();
-                if selection_end.is_none() && before == after {
-                    if active_modifiers.ctrl {
-                        let line = content.caret_position.line;
-                        content
-                            .caret_position
-                            .set_position(line, potential_column_after);
+                if selection_end.is_none() {
+                    if before != after || active_modifiers.ctrl {
+                        content.selection.update_position(|cp| {
+                            let line = cp.line;
+                            cp.set_position(line, potential_column_after);
+                        });
                     } else {
-                        content
-                            .caret_position
-                            .move_left(content.text_buffer.line_widths());
+                        content.selection.update_position(|cp| {
+                            cp.move_left(content.text_buffer.line_widths());
+                        });
                     }
-                } else if selection_end.is_none() {
-                    let line = content.caret_position.line;
-                    content
-                        .caret_position
-                        .set_position(line - 1, potential_column_after);
                 }
             }
             KeyboardEdit::Cut => {
@@ -219,7 +217,9 @@ impl KeyboardEditHandler {
                     } else {
                         column += pasted_lines[0].len();
                     }
-                    content.caret_position.set_position(line, column);
+                    content.selection.update_position(|cp| {
+                        cp.set_position(line, column);
+                    });
                 }
                 Self::maybe_hide_selection(content, selection_start.line, selection_start.column);
             }
@@ -297,10 +297,13 @@ impl KeyboardEditHandler {
     }
 
     fn maybe_hide_selection(content: &mut Content, line: usize, column: usize) {
-        if content.root_position.is_some() {
+        if content.selection.root_position().is_some() {
             content.controls.hide_selection();
-            content.root_position = None;
-            content.caret_position.set_position(line, column);
+            content.selection.set_position(CaretPosition {
+                line,
+                column,
+                actual_column: column,
+            });
         }
     }
 

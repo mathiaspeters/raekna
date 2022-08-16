@@ -5,7 +5,7 @@ use crate::{
         active_modifiers::ActiveModifiers, content::Content, dimensions::Dimensions,
         user_input::KeyboardMovement,
     },
-    graphics::controls::{caret_position::CaretPosition, get_ordered_selection},
+    graphics::controls::caret_position::CaretPosition,
 };
 
 #[derive(Debug, Default)]
@@ -19,123 +19,153 @@ impl KeyboardMovementHandler {
         dimensions: &Dimensions,
         active_modifiers: ActiveModifiers,
     ) {
-        let previous_position = content.caret_position;
+        let previous_position = content.selection.caret_position();
         let line_widths = content.text_buffer.line_widths();
         let mut selection_handled = false;
         match movement {
-            KeyboardMovement::Up => match content.root_position {
-                Some(root) if !active_modifiers.shift => {
-                    let (start, _) = get_ordered_selection(root, content.caret_position);
-                    content
-                        .caret_position
-                        .set_position(start.line, start.column);
+            KeyboardMovement::Up => match content.selection.as_ordered() {
+                Some((start, _)) if !active_modifiers.shift => {
+                    content.selection.update_position(|cp| {
+                        cp.set_position(start.line, start.column);
+                    });
                 }
                 _ => {
-                    content.caret_position.move_up(line_widths);
+                    content.selection.update_position(|cp| {
+                        cp.move_up(line_widths);
+                    });
                 }
             },
-            KeyboardMovement::Down => match content.root_position {
-                Some(root) if !active_modifiers.shift => {
-                    let (_, end) = get_ordered_selection(root, content.caret_position);
-                    content.caret_position.set_position(end.line, end.column);
+            KeyboardMovement::Down => match content.selection.as_ordered() {
+                Some((_, end)) if !active_modifiers.shift => {
+                    content.selection.update_position(|cp| {
+                        cp.set_position(end.line, end.column);
+                    });
                 }
                 _ => {
-                    content.caret_position.move_down(line_widths);
+                    content.selection.update_position(|cp| {
+                        cp.move_down(line_widths);
+                    });
                 }
             },
-            KeyboardMovement::Left => match content.root_position {
-                Some(root) if !active_modifiers.shift => {
-                    let (start, _) = get_ordered_selection(root, content.caret_position);
+            KeyboardMovement::Left => match content.selection.as_ordered() {
+                Some((start, _)) if !active_modifiers.shift => {
                     if active_modifiers.ctrl {
                         match content.calculator.get_word_boundaries(
-                            content.caret_position.into(),
+                            (content.selection.caret_position()).into(),
                             BoundaryPriority::Left,
                         ) {
-                            Some((boundary, _)) => content
-                                .caret_position
-                                .set_position(boundary.line, boundary.column),
+                            Some((boundary, _)) => {
+                                content.selection.update_position(|cp| {
+                                    cp.set_position(boundary.line, boundary.column)
+                                });
+                            }
                             None => content
-                                .caret_position
-                                .set_position(start.line, start.column),
+                                .selection
+                                .update_position(|cp| cp.set_position(start.line, start.column)),
                         }
                     } else {
-                        content
-                            .caret_position
-                            .set_position(start.line, start.column);
+                        content.selection.update_position(|cp| {
+                            cp.set_position(start.line, start.column);
+                        });
                     }
                 }
                 _ => {
                     if active_modifiers.ctrl {
                         match content.calculator.get_word_boundaries(
-                            content.caret_position.into(),
+                            (content.selection.caret_position()).into(),
                             BoundaryPriority::Left,
                         ) {
-                            Some((boundary, _)) => content
-                                .caret_position
-                                .set_position(boundary.line, boundary.column),
+                            Some((boundary, _)) => {
+                                content.selection.update_position(|cp| {
+                                    cp.set_position(boundary.line, boundary.column)
+                                });
+                            }
                             None => {
-                                content.caret_position.move_left(line_widths);
+                                content.selection.update_position(|cp| {
+                                    cp.move_left(line_widths);
+                                });
                             }
                         }
                     } else {
-                        content.caret_position.move_left(line_widths);
+                        content.selection.update_position(|cp| {
+                            cp.move_left(line_widths);
+                        });
                     }
                 }
             },
-            KeyboardMovement::Right => match content.root_position {
-                Some(root) if !active_modifiers.shift => {
-                    let (_, end) = get_ordered_selection(root, content.caret_position);
+            KeyboardMovement::Right => match content.selection.as_ordered() {
+                Some((_, end)) if !active_modifiers.shift => {
                     if active_modifiers.ctrl {
                         match content.calculator.get_word_boundaries(
-                            content.caret_position.into(),
+                            (content.selection.caret_position()).into(),
                             BoundaryPriority::Right,
                         ) {
-                            Some((_, boundary)) => content
-                                .caret_position
-                                .set_position(boundary.line, boundary.column),
-                            None => content.caret_position.set_position(end.line, end.column),
+                            Some((_, boundary)) => {
+                                content.selection.update_position(|cp| {
+                                    cp.set_position(boundary.line, boundary.column)
+                                });
+                            }
+                            None => content
+                                .selection
+                                .update_position(|cp| cp.set_position(end.line, end.column)),
                         }
                     } else {
-                        content.caret_position.set_position(end.line, end.column);
+                        content.selection.update_position(|cp| {
+                            cp.set_position(end.line, end.column);
+                        });
                     }
                 }
                 _ => {
                     if active_modifiers.ctrl {
                         match content.calculator.get_word_boundaries(
-                            content.caret_position.into(),
+                            (content.selection.caret_position()).into(),
                             BoundaryPriority::Right,
                         ) {
-                            Some((_, boundary)) => content
-                                .caret_position
-                                .set_position(boundary.line, boundary.column),
+                            Some((_, boundary)) => {
+                                content.selection.update_position(|cp| {
+                                    cp.set_position(boundary.line, boundary.column)
+                                });
+                            }
                             None => {
-                                content.caret_position.move_right(line_widths);
+                                content.selection.update_position(|cp| {
+                                    cp.move_right(line_widths);
+                                });
                             }
                         }
                     } else {
-                        content.caret_position.move_right(line_widths);
+                        content.selection.update_position(|cp| {
+                            cp.move_right(line_widths);
+                        });
                     }
                 }
             },
             KeyboardMovement::Home => {
-                if active_modifiers.ctrl {
-                    content.caret_position.page_up();
-                } else {
-                    content.caret_position.home();
-                }
+                content.selection.update_position(|cp| {
+                    if active_modifiers.ctrl {
+                        cp.page_up();
+                    } else {
+                        cp.home();
+                    }
+                });
             }
             KeyboardMovement::End => {
-                if active_modifiers.ctrl {
-                    content.caret_position.page_down(line_widths);
-                } else {
-                    content.caret_position.end(line_widths);
-                }
+                content.selection.update_position(|cp| {
+                    if active_modifiers.ctrl {
+                        cp.page_down(line_widths);
+                    } else {
+                        cp.end(line_widths);
+                    }
+                });
             }
             KeyboardMovement::PageUp => {
-                content.caret_position.page_up();
+                content.selection.update_position(|cp| {
+                    cp.page_up();
+                });
             }
             KeyboardMovement::PageDown => {
-                content.caret_position.page_down(line_widths);
+                content.selection.update_position(|cp| {
+                    cp.page_down(line_widths);
+                });
             }
             KeyboardMovement::SelectAll => {
                 let selection_start = CaretPosition {
@@ -174,18 +204,18 @@ impl KeyboardMovementHandler {
             )
         };
 
-        match (content.root_position, active_modifiers.shift) {
+        match (content.selection.root_position(), active_modifiers.shift) {
             (None, true) => {
-                content.root_position = Some(previous_position);
-                show_selection(previous_position, content.caret_position);
+                content.selection.set_root(Some(previous_position));
+                show_selection(previous_position, content.selection.caret_position());
                 true
             }
             (Some(position), true) => {
-                show_selection(position, content.caret_position);
+                show_selection(position, content.selection.caret_position());
                 true
             }
             (Some(_), false) => {
-                content.root_position = None;
+                content.selection.set_root(None);
                 content.controls.hide_selection();
                 true
             }

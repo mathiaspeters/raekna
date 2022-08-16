@@ -2,6 +2,7 @@ mod active_modifiers;
 pub mod content;
 pub mod dimensions;
 mod input_handler;
+pub mod selection;
 pub mod text_buffer;
 pub mod user_input;
 

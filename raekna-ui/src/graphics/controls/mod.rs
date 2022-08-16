@@ -1,6 +1,5 @@
 use std::time::Instant;
 
-pub use selection::get_ordered_selection;
 use wgpu::Device;
 use winit::dpi::PhysicalPosition;
 
