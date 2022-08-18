@@ -1,13 +1,13 @@
 use std::str::FromStr;
 
 use raekna_common::{
-    expression::{Expression, Literal as LiteralExpr},
+    expression::{Expression, Literal},
     function_name::FunctionName,
 };
 
 use crate::{
     errors::ParserResult,
-    lexer::{Literal, Operator, Token, TokenTree},
+    lexer::{Operator, Token, TokenTree},
     ParserError,
 };
 
@@ -59,10 +59,10 @@ impl Parser {
                 Token::Literal(literal) => {
                     let sn = match literal {
                         Literal::Integer(i) => {
-                            LiteralExpr::Integer(if self.should_negate { -i } else { i })
+                            Literal::Integer(if self.should_negate { -i } else { i })
                         }
                         Literal::Float(f) => {
-                            LiteralExpr::Float(if self.should_negate { -f } else { f })
+                            Literal::Float(if self.should_negate { -f } else { f })
                         }
                     };
                     self.is_sign = false;
@@ -237,7 +237,7 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::lexer::{Literal, Operator, Token};
+    use crate::lexer::{Operator, Token};
 
     mod operator_ordering {
         use super::*;
@@ -266,14 +266,14 @@ mod tests {
                             Expression::Function(
                                 FunctionName::Add,
                                 vec![
-                                    Expression::Literal(LiteralExpr::Integer(1)),
-                                    Expression::Literal(LiteralExpr::Integer(2)),
+                                    Expression::Literal(Literal::Integer(1)),
+                                    Expression::Literal(Literal::Integer(2)),
                                 ],
                             ),
-                            Expression::Literal(LiteralExpr::Integer(3)),
+                            Expression::Literal(Literal::Integer(3)),
                         ],
                     ),
-                    Expression::Literal(LiteralExpr::Integer(4)),
+                    Expression::Literal(Literal::Integer(4)),
                 ],
             );
             let actual = convert_token_tree(tt, true).unwrap();
@@ -311,36 +311,36 @@ mod tests {
                             Expression::Function(
                                 FunctionName::Add,
                                 vec![
-                                    Expression::Literal(LiteralExpr::Integer(1)),
+                                    Expression::Literal(Literal::Integer(1)),
                                     Expression::Function(
                                         FunctionName::Divide,
                                         vec![
                                             Expression::Function(
                                                 FunctionName::Multiply,
                                                 vec![
-                                                    Expression::Literal(LiteralExpr::Integer(2)),
+                                                    Expression::Literal(Literal::Integer(2)),
                                                     Expression::Function(
                                                         FunctionName::Power,
                                                         vec![
-                                                            Expression::Literal(
-                                                                LiteralExpr::Integer(3),
-                                                            ),
-                                                            Expression::Literal(
-                                                                LiteralExpr::Integer(4),
-                                                            ),
+                                                            Expression::Literal(Literal::Integer(
+                                                                3,
+                                                            )),
+                                                            Expression::Literal(Literal::Integer(
+                                                                4,
+                                                            )),
                                                         ],
                                                     ),
                                                 ],
                                             ),
-                                            Expression::Literal(LiteralExpr::Integer(5)),
+                                            Expression::Literal(Literal::Integer(5)),
                                         ],
                                     ),
                                 ],
                             ),
-                            Expression::Literal(LiteralExpr::Integer(6)),
+                            Expression::Literal(Literal::Integer(6)),
                         ],
                     ),
-                    Expression::Literal(LiteralExpr::Integer(7)),
+                    Expression::Literal(Literal::Integer(7)),
                 ],
             );
             let actual = convert_token_tree(tt, true).unwrap();
@@ -381,7 +381,7 @@ mod tests {
                 vec![
                     Expression::Function(
                         FunctionName::SquareRoot,
-                        vec![Expression::Literal(LiteralExpr::Integer(1))],
+                        vec![Expression::Literal(Literal::Integer(1))],
                     ),
                     Expression::Function(
                         FunctionName::Add,
@@ -408,7 +408,7 @@ mod tests {
             ],
         };
 
-        let expected = Expression::Literal(LiteralExpr::Integer(-2));
+        let expected = Expression::Literal(Literal::Integer(-2));
         let actual = convert_token_tree(tt, true).unwrap();
 
         assert_eq!(actual, expected);
@@ -442,8 +442,8 @@ mod tests {
         let expected = Expression::Function(
             FunctionName::Add,
             vec![
-                Expression::Literal(LiteralExpr::Integer(-1)),
-                Expression::Literal(LiteralExpr::Integer(-2)),
+                Expression::Literal(Literal::Integer(-1)),
+                Expression::Literal(Literal::Integer(-2)),
             ],
         );
         let actual = convert_token_tree(tt, true).unwrap();

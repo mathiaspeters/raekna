@@ -5,7 +5,7 @@ use super::{
     token::Token,
 };
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TokenTree {
     pub num_operators: usize,
     pub tokens: Vec<Token>,
@@ -44,8 +44,10 @@ impl TokenTree {
 
 #[cfg(test)]
 mod tests {
+    use raekna_common::expression::Literal;
+
     use super::*;
-    use crate::lexer::token::{Literal, Operator};
+    use crate::lexer::token::Operator;
 
     #[test]
     fn empty_input() {

@@ -12,10 +12,11 @@ use nom::{
     IResult,
 };
 use number_parsers::*;
+use raekna_common::expression::Literal;
 use text_parsers::*;
 
 use crate::lexer::{
-    token::{Literal, Operator, Token},
+    token::{Operator, Token},
     token_tree::TokenTree,
 };
 
