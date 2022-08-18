@@ -9,7 +9,7 @@ use crate::{
     constants::{SCROLLBAR_WIDTH_MULTIPLIER, TEXT_PADDING},
     coordinator::{
         active_modifiers::ActiveModifiers, content::Content, dimensions::Dimensions,
-        user_input::MouseInput,
+        selection::Selection, user_input::MouseInput,
     },
     graphics::controls::{caret_position::CaretPosition, ScrollHandleState},
 };
@@ -19,7 +19,7 @@ pub struct MouseInputHandler {
     mouse_position: PhysicalPosition<f32>,
     mouse_click_position: CaretPosition,
     mouse_is_clicked: bool,
-    selection: (CaretPosition, Option<CaretPosition>),
+    selection: Selection,
     pub cursor_icon: CursorIcon,
 }
 
@@ -191,18 +191,20 @@ impl MouseInputHandler {
                                 column: line_widths[line_widths.len() - 1],
                                 actual_column: line_widths[line_widths.len() - 1],
                             };
-                            self.selection.0 = selection_start;
+                            self.selection.update_position(|cp| *cp = selection_start);
                             self.set_selection(selection_start, selection_end);
                         } else if click_count == 3 {
                             let mut clicked_position = self.get_line_and_column(dimensions);
                             self.normalize_caret_position(&mut clicked_position, line_widths);
                             let is_last_line = clicked_position.line == line_widths.len() - 1;
                             if !active_modifiers.shift {
-                                self.selection.0 = CaretPosition {
-                                    line: clicked_position.line,
-                                    column: 0,
-                                    actual_column: 0,
-                                };
+                                self.selection.update_position(|cp| {
+                                    *cp = CaretPosition {
+                                        line: clicked_position.line,
+                                        column: 0,
+                                        actual_column: 0,
+                                    }
+                                });
                             }
                             let selection_end = if is_last_line {
                                 CaretPosition {
@@ -217,7 +219,7 @@ impl MouseInputHandler {
                                     actual_column: 0,
                                 }
                             };
-                            self.set_selection(self.selection.0, selection_end);
+                            self.set_selection(self.selection.caret_position(), selection_end);
                         } else if click_count == 2 {
                             let clicked_position = self.get_line_and_column(dimensions);
                             let clicked_position =
@@ -230,8 +232,10 @@ impl MouseInputHandler {
                                     if active_modifiers.shift {
                                         todo!()
                                     } else {
-                                        self.selection.0 = boundary_start.into();
-                                        self.selection.1 = Some(boundary_end.into());
+                                        self.selection.set_selection(
+                                            boundary_start.into(),
+                                            boundary_end.into(),
+                                        );
                                     }
                                 }
                                 None => {
@@ -242,7 +246,7 @@ impl MouseInputHandler {
                                         &mut clicked_position,
                                         line_widths,
                                     );
-                                    self.selection = (clicked_position, None);
+                                    self.selection.set_position(clicked_position);
                                 }
                             }
                         } else if active_modifiers.shift {
@@ -257,7 +261,7 @@ impl MouseInputHandler {
                             self.mouse_click_position = self.get_line_and_column(dimensions);
                             let mut clicked_position = self.mouse_click_position;
                             self.normalize_caret_position(&mut clicked_position, line_widths);
-                            self.selection = (clicked_position, None);
+                            self.selection.set_position(clicked_position);
                         }
                         content.handle_selection(dimensions, self.selection);
                         content.update_caret_position(dimensions);
@@ -354,12 +358,13 @@ impl MouseInputHandler {
         end_position: CaretPosition,
     ) -> bool {
         if start_position == end_position {
-            self.selection.1 = None;
+            self.selection.set_root(None);
             false
-        } else if matches!(self.selection.1, Some(selection_end) if selection_end == end_position) {
+        } else if matches!(self.selection.root_position(), Some(selection_end) if selection_end == end_position)
+        {
             false
         } else {
-            self.selection.1 = Some(end_position);
+            self.selection.set_root(Some(end_position));
             true
         }
     }

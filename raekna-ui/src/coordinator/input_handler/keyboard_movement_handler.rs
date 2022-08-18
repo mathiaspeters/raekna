@@ -3,7 +3,7 @@ use raekna_common::BoundaryPriority;
 use crate::{
     coordinator::{
         active_modifiers::ActiveModifiers, content::Content, dimensions::Dimensions,
-        user_input::KeyboardMovement,
+        selection::Selection, user_input::KeyboardMovement,
     },
     graphics::controls::caret_position::CaretPosition,
 };
@@ -178,7 +178,8 @@ impl KeyboardMovementHandler {
                     column: line_widths[line_widths.len() - 1],
                     actual_column: line_widths[line_widths.len() - 1],
                 };
-                let selection = (selection_start, Some(selection_end));
+                let mut selection = Selection::new(selection_start);
+                selection.set_root(Some(selection_end));
                 content.handle_selection(dimensions, selection);
                 selection_handled = true;
             }

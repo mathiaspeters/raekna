@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::graphics::controls::caret_position::CaretPosition;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Selection {
     None(CaretPosition),
     Some {
@@ -89,5 +89,11 @@ impl Selection {
                 op(caret_position)
             }
         }
+    }
+}
+
+impl Default for Selection {
+    fn default() -> Self {
+        Self::None(Default::default())
     }
 }

@@ -85,21 +85,19 @@ impl Content {
         }
     }
 
-    pub fn handle_selection(
-        &mut self,
-        dimensions: &Dimensions,
-        selection: (CaretPosition, Option<CaretPosition>),
-    ) {
-        let (start, end) = selection;
-        match end {
-            Some(end) => {
-                self.selection.set_selection(start, end);
+    pub fn handle_selection(&mut self, dimensions: &Dimensions, selection: Selection) {
+        match selection {
+            Selection::Some {
+                caret_position,
+                root_position,
+            } => {
+                self.selection.set_selection(caret_position, root_position);
                 let line_widths = self.text_buffer.line_widths();
                 self.controls
-                    .show_selection(dimensions, line_widths, start, end)
+                    .show_selection(dimensions, line_widths, caret_position, root_position)
             }
-            None => {
-                self.selection.set_position(start);
+            Selection::None(caret_position) => {
+                self.selection.set_position(caret_position);
                 self.controls.hide_selection();
             }
         }
