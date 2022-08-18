@@ -25,7 +25,7 @@ impl Selection {
         if !self.should_show {
             return;
         }
-        let (start, end) = get_ordered_selection(self.start, self.end);
+        let (start, end) = Self::get_ordered_selection(self.start, self.end);
         let num_rows = (end.line - start.line) + 1;
         let mut row_selections = Vec::with_capacity(num_rows);
         if num_rows == 1 {
@@ -91,16 +91,16 @@ impl Selection {
         let indices_to_truncate_to = 4 * 6;
         indices.truncate(indices_to_truncate_to);
     }
-}
 
-pub fn get_ordered_selection(
-    left: CaretPosition,
-    right: CaretPosition,
-) -> (CaretPosition, CaretPosition) {
-    match left.line.cmp(&right.line) {
-        Ordering::Equal if left.column <= right.column => (left, right),
-        Ordering::Equal => (right, left),
-        Ordering::Less => (left, right),
-        Ordering::Greater => (right, left),
+    fn get_ordered_selection(
+        left: CaretPosition,
+        right: CaretPosition,
+    ) -> (CaretPosition, CaretPosition) {
+        match left.line.cmp(&right.line) {
+            Ordering::Equal if left.column <= right.column => (left, right),
+            Ordering::Equal => (right, left),
+            Ordering::Less => (left, right),
+            Ordering::Greater => (right, left),
+        }
     }
 }
