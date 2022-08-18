@@ -16,7 +16,7 @@ pub trait RCalculator {
     ) -> Option<(EditPosition, EditPosition)>;
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct EditPosition {
     pub line: usize,
     pub column: usize,
@@ -28,7 +28,7 @@ impl EditPosition {
     }
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum BoundaryPriority {
     None,
     Left,

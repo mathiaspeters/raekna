@@ -22,6 +22,7 @@ impl Literal {
     }
 }
 
+impl Eq for Literal {}
 impl PartialEq for Literal {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
@@ -60,7 +61,7 @@ impl From<f64> for Literal {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Expression {
     Literal(Literal),
     Variable(String, Box<Expression>),

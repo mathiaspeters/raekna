@@ -2,7 +2,7 @@ use std::{fmt, str::FromStr};
 
 use crate::errors::{CommonError, CommonResult};
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum FunctionName {
     // Arithmetic
     Add,

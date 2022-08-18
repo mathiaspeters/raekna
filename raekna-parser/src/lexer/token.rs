@@ -1,12 +1,8 @@
+use raekna_common::expression::Literal;
+
 use super::token_tree::TokenTree;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum Literal {
-    Integer(i64),
-    Float(f64),
-}
-
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Operator {
     Add,
     Subtract,
@@ -16,7 +12,7 @@ pub enum Operator {
     Power,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Token {
     Literal(Literal),
     Operator(Operator),

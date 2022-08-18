@@ -2,7 +2,7 @@ use raekna_common::{expression::Literal, function_name::FunctionName};
 
 pub type ComputeResult<T> = Result<T, ComputeError>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum ComputeError {
     UnknownVariable(String),
     VariableNameTaken(String),

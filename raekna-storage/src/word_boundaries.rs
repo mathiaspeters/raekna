@@ -120,7 +120,7 @@ struct CharSequence {
     end: usize,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 enum SequenceType {
     Word,
     Whitespace,
