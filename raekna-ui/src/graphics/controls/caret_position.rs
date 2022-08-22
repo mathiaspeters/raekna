@@ -1,6 +1,6 @@
 use raekna_common::EditPosition;
 
-#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CaretPosition {
     pub line: usize,
     pub column: usize,

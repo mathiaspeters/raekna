@@ -86,17 +86,15 @@ impl Content {
     }
 
     pub fn handle_selection(&mut self, dimensions: &Dimensions, selection: Selection) {
-        match selection {
-            Selection::Some {
-                caret_position,
-                root_position,
-            } => {
+        let caret_position = selection.caret_position();
+        match selection.root_position() {
+            Some(root_position) => {
                 self.selection.set_selection(caret_position, root_position);
                 let line_widths = self.text_buffer.line_widths();
                 self.controls
                     .show_selection(dimensions, line_widths, caret_position, root_position)
             }
-            Selection::None(caret_position) => {
+            None => {
                 self.selection.set_position(caret_position);
                 self.controls.hide_selection();
             }

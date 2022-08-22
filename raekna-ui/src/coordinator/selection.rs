@@ -9,6 +9,10 @@ pub enum Selection {
         caret_position: CaretPosition,
         root_position: CaretPosition,
     },
+    MultiClick {
+        caret_position: CaretPosition,
+        root_position: (CaretPosition, CaretPosition),
+    },
 }
 
 impl Selection {
@@ -16,11 +20,18 @@ impl Selection {
         Self::None(position)
     }
 
+    pub fn from_multiclick(left: CaretPosition, right: CaretPosition) -> Self {
+        Self::MultiClick {
+            caret_position: right,
+            root_position: (left, right),
+        }
+    }
+
     pub fn caret_position(&self) -> CaretPosition {
         match self {
-            Selection::None(caret_position) | Selection::Some { caret_position, .. } => {
-                *caret_position
-            }
+            Selection::None(caret_position)
+            | Selection::Some { caret_position, .. }
+            | Selection::MultiClick { caret_position, .. } => *caret_position,
         }
     }
 
@@ -28,6 +39,18 @@ impl Selection {
         match self {
             Selection::None(_) => None,
             Selection::Some { root_position, .. } => Some(*root_position),
+            Selection::MultiClick {
+                caret_position,
+                root_position: (l_root, r_root),
+            } => {
+                if caret_position <= l_root {
+                    Some(*r_root)
+                } else if caret_position >= r_root {
+                    Some(*l_root)
+                } else {
+                    unreachable!("In a multiclick selection the roots are guaranteed to be ordered and if the caret is ever placed between roots it should change to a Selection::Some")
+                }
+            }
         }
     }
 
@@ -54,7 +77,7 @@ impl Selection {
     pub fn set_root(&mut self, root_position: Option<CaretPosition>) {
         match root_position {
             Some(root) => match self {
-                Selection::None(caret_position) => {
+                Selection::None(caret_position) | Selection::MultiClick { caret_position, .. } => {
                     *self = Self::Some {
                         caret_position: *caret_position,
                         root_position: root,
@@ -66,7 +89,8 @@ impl Selection {
             },
             None => match self {
                 Selection::None(_) => {}
-                Selection::Some { caret_position, .. } => {
+                Selection::Some { caret_position, .. }
+                | Selection::MultiClick { caret_position, .. } => {
                     *self = Self::None(*caret_position);
                 }
             },
@@ -85,9 +109,9 @@ impl Selection {
         F: FnMut(&mut CaretPosition),
     {
         match self {
-            Selection::None(caret_position) | Selection::Some { caret_position, .. } => {
-                op(caret_position)
-            }
+            Selection::None(caret_position)
+            | Selection::Some { caret_position, .. }
+            | Selection::MultiClick { caret_position, .. } => op(caret_position),
         }
     }
 }

@@ -197,15 +197,15 @@ impl MouseInputHandler {
                             let mut clicked_position = self.get_line_and_column(dimensions);
                             self.normalize_caret_position(&mut clicked_position, line_widths);
                             let is_last_line = clicked_position.line == line_widths.len() - 1;
-                            if !active_modifiers.shift {
-                                self.selection.update_position(|cp| {
-                                    *cp = CaretPosition {
-                                        line: clicked_position.line,
-                                        column: 0,
-                                        actual_column: 0,
-                                    }
-                                });
-                            }
+                            let selection_start = if !active_modifiers.shift {
+                                CaretPosition {
+                                    line: clicked_position.line,
+                                    column: 0,
+                                    actual_column: 0,
+                                }
+                            } else {
+                                self.selection.caret_position()
+                            };
                             let selection_end = if is_last_line {
                                 CaretPosition {
                                     line: line_widths.len() - 1,
@@ -219,7 +219,8 @@ impl MouseInputHandler {
                                     actual_column: 0,
                                 }
                             };
-                            self.set_selection(self.selection.caret_position(), selection_end);
+                            self.selection =
+                                Selection::from_multiclick(selection_start, selection_end);
                         } else if click_count == 2 {
                             let clicked_position = self.get_line_and_column(dimensions);
                             let clicked_position =
