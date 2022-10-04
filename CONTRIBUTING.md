@@ -7,6 +7,14 @@ This repository welcomes contributions of all kinds, including:
 - PR submissions
 - PR reviews
 
+There is one exception to "contributions of all kinds", which is changes to the UI layer. There will soon be a big refactor of the UI layer to make it easier to work with an reason about and until then only bug fixes will be allowed. Alternative UI implementations, such as a terminal UI, are welcome though.
+
+Especially of value are:
+- Tests for anything except the UI layer (either new tests or meaningfully improving existing tests)
+- Quality documentation
+
+New features in the parser and evaluator are also welcome.
+
 ## Working with this project
 
 ### Setting Up Your Build Environment

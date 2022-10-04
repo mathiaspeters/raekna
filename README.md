@@ -2,6 +2,8 @@
 
 Raekna is a plain text calculator written in Rust. The name is the ascii spelling of the Swedish word "Räkna" which means count or calculate.
 
+![Application screenshot](/docs/images/raekna.png "Application screenshot")
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to build and contribute to this repository.
