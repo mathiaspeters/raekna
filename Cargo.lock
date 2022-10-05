@@ -1390,7 +1390,7 @@ checksum = "3b70f4520a7b3c3909ca4f139aa8551d712fd85e4ef252fcdf51d78f4b8b4558"
 
 [[package]]
 name = "raekna-compute"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "proptest",
  "raekna-common 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1812,7 +1812,7 @@ version = "1.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if 0.1.10",
  "rand",
  "static_assertions",
 ]
