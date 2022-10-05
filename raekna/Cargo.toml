@@ -1,6 +1,6 @@
 [package]
 name = "raekna"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Mathias Peters"]
 edition = "2021"
 description = "This crate combines the other crates in the workspace to make a functional program."
