@@ -1398,7 +1398,7 @@ dependencies = [
 
 [[package]]
 name = "raekna-parser"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "nom",
  "raekna-common 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
