@@ -4,7 +4,7 @@ use super::{caret_position::CaretPosition, rectangle::Rectangle, update_indices,
 use crate::{
     constants::{CARET_WIDTH, SELECTION_COLOR, TEXT_PADDING},
     coordinator::dimensions::Dimensions,
-    graphics::vertex::Vertex,
+    rendering::vertex::Vertex,
 };
 
 #[derive(Default)]

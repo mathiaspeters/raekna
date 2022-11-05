@@ -132,7 +132,7 @@ impl Dimensions {
 
     fn get_glyph_size() -> PhysicalSize<f32> {
         let inconsolata = FontArc::try_from_slice(include_bytes!(
-            "../graphics/resources/Inconsolata-Regular.ttf"
+            "../rendering/resources/Inconsolata-Regular.ttf"
         ))
         .unwrap();
         let scaled = inconsolata.as_scaled(PxScale::from(TEXT_SCALING));

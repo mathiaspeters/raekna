@@ -1,13 +1,10 @@
 use std::iter;
 
+use wgpu_glyph::Section;
 use winit::window::Window;
 
-use super::{buffers::Buffers, controls::Controls, text_painter::TextPainter};
-use crate::{
-    constants::BACKGROUND_COLOR,
-    coordinator::{content::Content, dimensions::Dimensions},
-    graphics::vertex::Vertex,
-};
+use super::{buffers::Buffers, text_painter::TextPainter, vertex::Vertex};
+use crate::constants::BACKGROUND_COLOR;
 
 pub struct Renderer {
     surface: wgpu::Surface,
@@ -17,11 +14,10 @@ pub struct Renderer {
     pub size: winit::dpi::PhysicalSize<u32>,
     render_pipeline: wgpu::RenderPipeline,
     text_painter: TextPainter,
-    buffers: Buffers,
 }
 
 impl Renderer {
-    pub async fn new(window: &Window, controls: &Controls) -> Self {
+    pub async fn new(window: &Window) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
@@ -118,8 +114,6 @@ impl Renderer {
 
         let text_painter = TextPainter::new(&size, &device, render_format);
 
-        let buffers = controls.get_as_buffers(&device);
-
         Self {
             surface,
             device,
@@ -128,28 +122,21 @@ impl Renderer {
             size,
             render_pipeline,
             text_painter,
-            buffers,
         }
     }
 
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
-        if new_size.width > 0 && new_size.height > 0 {
-            self.size = new_size;
-            self.config.width = new_size.width;
-            self.config.height = new_size.height;
-            self.surface.configure(&self.device, &self.config);
-            self.text_painter.resize(&new_size);
-        }
+        self.size = new_size;
+        self.config.width = new_size.width;
+        self.config.height = new_size.height;
+        self.surface.configure(&self.device, &self.config);
+        self.text_painter.resize(&new_size);
     }
 
-    pub fn update(&mut self, controls: &Controls) {
-        self.buffers = controls.get_as_buffers(&self.device);
-    }
-
-    pub fn render(
+    pub fn render<'a>(
         &mut self,
-        content: &Content,
-        dimensions: &Dimensions,
+        buffers: Buffers,
+        sections: Vec<Section<'a>>,
     ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
@@ -181,14 +168,14 @@ impl Renderer {
                 ref vertex_buffer,
                 ref index_buffer,
                 num_indices,
-            } = self.buffers;
+            } = buffers;
             render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
             render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16);
             render_pass.draw_indexed(0..num_indices, 0, 0..1);
         }
 
         self.text_painter
-            .draw(&self.device, &view, &mut encoder, content, dimensions);
+            .draw(&self.device, &view, &mut encoder, sections);
 
         self.queue.submit(iter::once(encoder.finish()));
         output.present();

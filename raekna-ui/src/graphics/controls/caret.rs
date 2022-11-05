@@ -7,7 +7,7 @@ use super::{
 use crate::{
     constants::{CARET_COLOR, CARET_PERIOD, CARET_WIDTH, TEXT_PADDING},
     coordinator::dimensions::Dimensions,
-    graphics::vertex::Vertex,
+    rendering::vertex::Vertex,
 };
 
 pub struct Caret {

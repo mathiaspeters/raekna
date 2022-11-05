@@ -2,7 +2,7 @@ use super::{rectangle::Rectangle, update_indices, update_vertices, ScrollHandleS
 use crate::{
     constants::{SCROLLBAR_BACKGROUND_COLOR, SCROLLBAR_BASE_COLOR, SCROLLBAR_WIDTH_MULTIPLIER},
     coordinator::dimensions::Dimensions,
-    graphics::vertex::Vertex,
+    rendering::vertex::Vertex,
 };
 
 pub struct Scrollbar {

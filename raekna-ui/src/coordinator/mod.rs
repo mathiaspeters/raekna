@@ -22,11 +22,11 @@ use self::{
     input_handler::{multi_click_state::MultiClickState, InputHandler},
     user_input::{KeyboardEdit, MouseInput, UserInput},
 };
-use crate::{constants::TEXT_PADDING, graphics::renderer::Renderer};
+use crate::{constants::TEXT_PADDING, rendering::render_manager::RenderManager};
 
 pub struct Coordinator {
     pub window: Window,
-    renderer: Renderer,
+    renderer: RenderManager,
     dimensions: Dimensions,
     content: Content,
     input_handler: InputHandler,
@@ -43,7 +43,7 @@ impl Coordinator {
             .build(event_loop)
             .unwrap();
         let content = Content::new(calculator, &mut dimensions);
-        let renderer = futures_lite::future::block_on(Renderer::new(&window, &content.controls));
+        let renderer = futures_lite::future::block_on(RenderManager::new(&window));
         let input_handler = InputHandler::default();
         let multi_click_state = MultiClickState::default();
         let mut coordinator = Self {
@@ -59,13 +59,13 @@ impl Coordinator {
     }
 
     pub fn redraw(&mut self) -> Result<(), wgpu::SurfaceError> {
-        self.renderer.update(&self.content.controls);
-        self.renderer.render(&self.content, &self.dimensions)?;
+        self.renderer
+            .render(&self.content.controls, &self.content, &self.dimensions)?;
         Ok(())
     }
 
     pub fn reconfigure_surface(&mut self) {
-        let size = self.renderer.size;
+        let size = self.renderer.size();
         self.handle_resize(size);
     }
 

@@ -1,4 +1,4 @@
-use crate::graphics::vertex::Vertex;
+use crate::rendering::vertex::Vertex;
 
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Rectangle {

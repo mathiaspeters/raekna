@@ -1,66 +1,50 @@
-use wgpu::{util::StagingBelt, CommandEncoder, Device, TextureFormat, TextureView};
-use wgpu_glyph::{ab_glyph::FontArc, GlyphBrush, GlyphBrushBuilder, Section, Text};
+use wgpu_glyph::{Section, Text};
+use winit::{dpi::PhysicalSize, window::Window};
+
+use crate::{
+    coordinator::{content::Content, dimensions::Dimensions},
+    graphics::controls::Controls,
+};
 
 use crate::{
     constants::{TEXT_COLOR, TEXT_PADDING, TEXT_SCALING},
-    coordinator::{content::Content, dimensions::Dimensions, text_buffer::entry},
+    coordinator::text_buffer::entry,
 };
 
-pub struct TextPainter {
-    window_size: (u32, u32),
-    glyph_brush: GlyphBrush<()>,
-    staging_belt: StagingBelt,
+use super::renderer::Renderer;
+
+pub struct RenderManager {
+    renderer: Renderer,
 }
 
-impl TextPainter {
-    pub fn new(
-        size: &winit::dpi::PhysicalSize<u32>,
-        device: &Device,
-        render_format: TextureFormat,
-    ) -> Self {
-        let window_size = (size.width, size.height);
+impl RenderManager {
+    pub async fn new(window: &Window) -> Self {
+        let renderer = Renderer::new(window).await;
+        Self { renderer }
+    }
 
-        let inconsolata =
-            FontArc::try_from_slice(include_bytes!("./resources/Inconsolata-Regular.ttf")).unwrap();
-        let glyph_brush = GlyphBrushBuilder::using_font(inconsolata).build(device, render_format);
+    pub fn size(&self) -> PhysicalSize<u32> {
+        self.renderer.size
+    }
 
-        let staging_belt = wgpu::util::StagingBelt::new(1024);
-
-        Self {
-            window_size,
-            glyph_brush,
-            staging_belt,
+    pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+        if new_size.width > 0 && new_size.height > 0 {
+            self.renderer.resize(new_size);
         }
     }
 
-    pub fn resize(&mut self, new_size: &winit::dpi::PhysicalSize<u32>) {
-        self.window_size = (new_size.width, new_size.height);
-    }
-
-    pub fn draw(
+    pub fn render(
         &mut self,
-        device: &Device,
-        target: &TextureView,
-        encoder: &mut CommandEncoder,
+        controls: &Controls,
         content: &Content,
         dimensions: &Dimensions,
-    ) {
-        Self::make_sections(content, dimensions)
-            .into_iter()
-            .for_each(|section| self.glyph_brush.queue(section));
+    ) -> Result<(), wgpu::SurfaceError> {
+        let buffers = controls.get_as_buffers(&self.renderer.device);
+        let sections = Self::make_sections(content, dimensions);
 
-        let (width, height) = self.window_size;
-        self.glyph_brush
-            .draw_queued(
-                device,
-                &mut self.staging_belt,
-                encoder,
-                target,
-                width,
-                height,
-            )
-            .expect("Draw queued");
-        self.staging_belt.finish();
+        self.renderer.render(buffers, sections)?;
+
+        Ok(())
     }
 
     fn make_sections<'a>(content: &'a Content, dimensions: &Dimensions) -> Vec<Section<'a>> {

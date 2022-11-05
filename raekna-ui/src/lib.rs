@@ -4,6 +4,7 @@ mod constants;
 mod coordinator;
 mod event_loop;
 mod graphics;
+mod rendering;
 
 pub fn show_ui(calculator: Box<dyn RCalculator>) {
     env_logger::init();

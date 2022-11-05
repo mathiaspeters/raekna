@@ -7,10 +7,10 @@ use self::{
     caret::Caret, caret_position::CaretPosition, rectangle::Rectangle, scrollbar::Scrollbar,
     selection::Selection, separator::Separator,
 };
-use super::{buffers::Buffers, vertex::Vertex};
 use crate::{
     constants::{SCROLLBAR_BASE_COLOR, SCROLLBAR_CLICK_COLOR, SCROLLBAR_HOVER_COLOR},
     coordinator::dimensions::Dimensions,
+    rendering::{buffers::Buffers, vertex::Vertex},
 };
 
 mod caret;

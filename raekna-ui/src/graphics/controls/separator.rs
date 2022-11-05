@@ -2,7 +2,7 @@ use super::{rectangle::Rectangle, update_indices, update_vertices};
 use crate::{
     constants::{SEPARATOR_COLOR, SEPARATOR_WIDTH},
     coordinator::dimensions::Dimensions,
-    graphics::vertex::Vertex,
+    rendering::vertex::Vertex,
 };
 
 #[derive(Default)]
