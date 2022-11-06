@@ -14,21 +14,24 @@ use crate::{
 use super::renderer::Renderer;
 
 pub struct RenderManager {
+    pub size: winit::dpi::PhysicalSize<u32>,
     renderer: Renderer,
 }
 
 impl RenderManager {
     pub async fn new(window: &Window) -> Self {
+        let size = window.inner_size();
         let renderer = Renderer::new(window).await;
-        Self { renderer }
+        Self { size, renderer }
     }
 
     pub fn size(&self) -> PhysicalSize<u32> {
-        self.renderer.size
+        self.size
     }
 
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
         if new_size.width > 0 && new_size.height > 0 {
+            self.size = new_size;
             self.renderer.resize(new_size);
         }
     }

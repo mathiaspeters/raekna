@@ -11,15 +11,12 @@ pub struct Renderer {
     pub device: wgpu::Device,
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
-    pub size: winit::dpi::PhysicalSize<u32>,
     render_pipeline: wgpu::RenderPipeline,
     text_painter: TextPainter,
 }
 
 impl Renderer {
     pub async fn new(window: &Window) -> Self {
-        let size = window.inner_size();
-
         // The instance is a handle to our GPU
         // BackendBit::PRIMARY => Vulkan + Metal + DX12 + Browser WebGPU
         let instance = wgpu::Instance::new(wgpu::Backends::all());
@@ -50,11 +47,12 @@ impl Renderer {
             let preferred_format = supported_formats.get(0).unwrap();
             *preferred_format
         };
+        let window_size = window.inner_size();
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: render_format,
-            width: size.width,
-            height: size.height,
+            width: window_size.width,
+            height: window_size.height,
             present_mode: wgpu::PresentMode::Fifo,
         };
         surface.configure(&device, &config);
@@ -112,25 +110,22 @@ impl Renderer {
             multiview: None,
         });
 
-        let text_painter = TextPainter::new(&size, &device, render_format);
+        let text_painter = TextPainter::new(&device, render_format);
 
         Self {
             surface,
             device,
             queue,
             config,
-            size,
             render_pipeline,
             text_painter,
         }
     }
 
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
-        self.size = new_size;
         self.config.width = new_size.width;
         self.config.height = new_size.height;
         self.surface.configure(&self.device, &self.config);
-        self.text_painter.resize(&new_size);
     }
 
     pub fn render<'a>(
@@ -174,8 +169,9 @@ impl Renderer {
             render_pass.draw_indexed(0..num_indices, 0, 0..1);
         }
 
+        let window_size = (self.config.width, self.config.height);
         self.text_painter
-            .draw(&self.device, &view, &mut encoder, sections);
+            .draw(&self.device, window_size, &view, &mut encoder, sections);
 
         self.queue.submit(iter::once(encoder.finish()));
         output.present();
