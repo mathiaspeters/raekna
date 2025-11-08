@@ -168,7 +168,7 @@ mod text_parsers {
     pub fn parentheses() -> impl Fn(&str) -> IResult<&str, &str> {
         move |input: &str| {
             let mut bracket_counter = 0;
-            for (index, c) in input.chars().enumerate() {
+            for (index, c) in input.char_indices() {
                 if index == 0 {
                     if c != '(' {
                         return Err(nom::Err::Error(nom::error::Error::from_error_kind(

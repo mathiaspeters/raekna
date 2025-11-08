@@ -1,5 +1,5 @@
-use wgpu::{util::StagingBelt, CommandEncoder, Device, TextureFormat, TextureView};
-use wgpu_glyph::{ab_glyph::FontArc, GlyphBrush, GlyphBrushBuilder, Section, Text};
+use wgpu::{CommandEncoder, Device, TextureFormat, TextureView, util::StagingBelt};
+use wgpu_glyph::{GlyphBrush, GlyphBrushBuilder, Section, Text, ab_glyph::FontArc};
 
 use crate::{
     constants::{TEXT_COLOR, TEXT_PADDING, TEXT_SCALING},
@@ -111,7 +111,7 @@ impl TextPainter {
         let (cl, rl) = text;
         let mut output = vec![];
 
-        let start_offset = c.segments.get(0).map(|s| s.start).unwrap_or(0);
+        let start_offset = c.segments.first().map(|s| s.start).unwrap_or(0);
         c.segments.iter().for_each(|s| {
             let text = &cl[s.start..s.end];
             let x_offset =
@@ -137,12 +137,14 @@ impl TextPainter {
         output
     }
 
-    fn build_section(text: &str, x_offset: f32, y_offset: f32) -> Section {
+    fn build_section(text: &str, x_offset: f32, y_offset: f32) -> Section<'_> {
         Section {
             screen_position: (x_offset, y_offset),
-            text: vec![Text::new(text)
-                .with_color(TEXT_COLOR)
-                .with_scale(TEXT_SCALING)],
+            text: vec![
+                Text::new(text)
+                    .with_color(TEXT_COLOR)
+                    .with_scale(TEXT_SCALING),
+            ],
             ..Section::default()
         }
     }

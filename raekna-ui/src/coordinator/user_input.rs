@@ -1,6 +1,7 @@
 use winit::{
     dpi::PhysicalPosition,
-    event::{ElementState, MouseButton, MouseScrollDelta, VirtualKeyCode},
+    event::{ElementState, MouseButton, MouseScrollDelta},
+    keyboard::KeyCode,
 };
 
 use super::active_modifiers::ActiveModifiers;
@@ -32,7 +33,7 @@ pub enum KeyboardEdit {
 #[derive(Copy, Clone, Debug)]
 pub enum MouseInput {
     CursorMoved(PhysicalPosition<f32>),
-    LineScroll(f32, f32),
+    LineScroll((), f32),
     PixelScroll(PhysicalPosition<f32>),
     MouseClick {
         state: ElementState,
@@ -50,27 +51,25 @@ pub enum UserInput {
 
 impl UserInput {
     pub fn from_key_code(
-        key_code: &Option<VirtualKeyCode>,
+        key_code: &Option<KeyCode>,
         active_modifiers: &ActiveModifiers,
     ) -> Option<Self> {
         key_code.and_then(|key_code| match key_code {
-            VirtualKeyCode::Home => Some(KeyboardMovement::Home.into()),
-            VirtualKeyCode::End => Some(KeyboardMovement::End.into()),
-            VirtualKeyCode::PageDown => Some(KeyboardMovement::PageDown.into()),
-            VirtualKeyCode::PageUp => Some(KeyboardMovement::PageUp.into()),
-            VirtualKeyCode::Left => Some(KeyboardMovement::Left.into()),
-            VirtualKeyCode::Up => Some(KeyboardMovement::Up.into()),
-            VirtualKeyCode::Right => Some(KeyboardMovement::Right.into()),
-            VirtualKeyCode::Down => Some(KeyboardMovement::Down.into()),
-            VirtualKeyCode::Return | VirtualKeyCode::NumpadEnter => {
-                Some(KeyboardEdit::NewLine.into())
-            }
-            VirtualKeyCode::Delete => Some(KeyboardEdit::Delete.into()),
-            VirtualKeyCode::Back => Some(KeyboardEdit::Backspace.into()),
-            VirtualKeyCode::X if active_modifiers.ctrl => Some(KeyboardEdit::Cut.into()),
-            VirtualKeyCode::C if active_modifiers.ctrl => Some(KeyboardEdit::Copy.into()),
-            VirtualKeyCode::V if active_modifiers.ctrl => Some(KeyboardEdit::Paste.into()),
-            VirtualKeyCode::A if active_modifiers.ctrl => Some(KeyboardMovement::SelectAll.into()),
+            KeyCode::Home => Some(KeyboardMovement::Home.into()),
+            KeyCode::End => Some(KeyboardMovement::End.into()),
+            KeyCode::PageDown => Some(KeyboardMovement::PageDown.into()),
+            KeyCode::PageUp => Some(KeyboardMovement::PageUp.into()),
+            KeyCode::ArrowLeft => Some(KeyboardMovement::Left.into()),
+            KeyCode::ArrowUp => Some(KeyboardMovement::Up.into()),
+            KeyCode::ArrowRight => Some(KeyboardMovement::Right.into()),
+            KeyCode::ArrowDown => Some(KeyboardMovement::Down.into()),
+            KeyCode::Enter | KeyCode::NumpadEnter => Some(KeyboardEdit::NewLine.into()),
+            KeyCode::Delete => Some(KeyboardEdit::Delete.into()),
+            KeyCode::Backspace => Some(KeyboardEdit::Backspace.into()),
+            KeyCode::KeyX if active_modifiers.ctrl => Some(KeyboardEdit::Cut.into()),
+            KeyCode::KeyC if active_modifiers.ctrl => Some(KeyboardEdit::Copy.into()),
+            KeyCode::KeyV if active_modifiers.ctrl => Some(KeyboardEdit::Paste.into()),
+            KeyCode::KeyA if active_modifiers.ctrl => Some(KeyboardMovement::SelectAll.into()),
             _ => None,
         })
     }
@@ -97,7 +96,7 @@ impl From<MouseInput> for UserInput {
 impl From<&MouseScrollDelta> for UserInput {
     fn from(delta: &MouseScrollDelta) -> Self {
         let mouse_input = match delta {
-            MouseScrollDelta::LineDelta(x, y) => MouseInput::LineScroll(*x, *y),
+            MouseScrollDelta::LineDelta(_, y) => MouseInput::LineScroll((), *y),
             MouseScrollDelta::PixelDelta(delta) => {
                 let delta = PhysicalPosition::new(delta.x as f32, delta.y as f32);
                 MouseInput::PixelScroll(delta)

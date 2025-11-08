@@ -1,4 +1,4 @@
-use winit::event::ModifiersState;
+use winit::keyboard::ModifiersState;
 
 #[derive(Copy, Clone, Debug, Default)]
 pub struct ActiveModifiers {
@@ -8,7 +8,7 @@ pub struct ActiveModifiers {
 
 impl ActiveModifiers {
     pub fn update(&mut self, state: &ModifiersState) {
-        self.shift = state.shift();
-        self.ctrl = state.ctrl();
+        self.shift = state.shift_key();
+        self.ctrl = state.control_key();
     }
 }

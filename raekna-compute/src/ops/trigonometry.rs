@@ -380,13 +380,25 @@ mod tests {
         #[test]
         fn positive_cases() {
             let test_cases = [
-                (Literal::Integer(-1), Literal::Float(-1.5707963267948966)),
+                (
+                    Literal::Integer(-1),
+                    Literal::Float(-core::f64::consts::FRAC_PI_2),
+                ),
                 (Literal::Integer(0), Literal::Integer(0)),
-                (Literal::Integer(1), Literal::Float(1.5707963267948966)),
-                (Literal::Float(-1.0), Literal::Float(-1.5707963267948966)),
+                (
+                    Literal::Integer(1),
+                    Literal::Float(core::f64::consts::FRAC_PI_2),
+                ),
+                (
+                    Literal::Float(-1.0),
+                    Literal::Float(-core::f64::consts::FRAC_PI_2),
+                ),
                 (Literal::Float(-0.6), Literal::Float(-0.6435011087932844)),
                 (Literal::Float(0.0), Literal::Integer(0)),
-                (Literal::Float(1.0), Literal::Float(1.5707963267948966)),
+                (
+                    Literal::Float(1.0),
+                    Literal::Float(core::f64::consts::FRAC_PI_2),
+                ),
                 (Literal::Float(0.723), Literal::Float(0.8081349986659526)),
             ];
             test_cases.into_iter().for_each(|(input, expected)| {
@@ -446,12 +458,18 @@ mod tests {
         #[test]
         fn positive_cases() {
             let test_cases = [
-                (Literal::Integer(-1), Literal::Float(3.141592653589793)),
-                (Literal::Integer(0), Literal::Float(1.5707963267948966)),
+                (Literal::Integer(-1), Literal::Float(core::f64::consts::PI)),
+                (
+                    Literal::Integer(0),
+                    Literal::Float(core::f64::consts::FRAC_PI_2),
+                ),
                 (Literal::Integer(1), Literal::Integer(0)),
-                (Literal::Float(-1.0), Literal::Float(3.141592653589793)),
+                (Literal::Float(-1.0), Literal::Float(core::f64::consts::PI)),
                 (Literal::Float(-0.9), Literal::Float(2.6905658417935308)),
-                (Literal::Float(0.0), Literal::Float(1.5707963267948966)),
+                (
+                    Literal::Float(0.0),
+                    Literal::Float(core::f64::consts::FRAC_PI_2),
+                ),
                 (Literal::Float(1.0), Literal::Integer(0)),
                 (Literal::Float(0.876), Literal::Float(0.5032910474523901)),
             ];

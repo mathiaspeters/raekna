@@ -1,6 +1,9 @@
 use std::time::Instant;
 
-use winit::event::{ElementState, KeyboardInput, MouseButton, VirtualKeyCode, WindowEvent};
+use winit::{
+    event::{ElementState, MouseButton, WindowEvent},
+    keyboard::{KeyCode, PhysicalKey},
+};
 
 use crate::constants::MULTI_CLICK_DELAY;
 
@@ -30,14 +33,16 @@ impl MultiClickState {
                     self.last_click_time = Some(Instant::now());
                 }
             }
-            WindowEvent::KeyboardInput {
-                input:
-                    KeyboardInput {
-                        virtual_keycode: Some(VirtualKeyCode::LShift | VirtualKeyCode::RShift),
-                        ..
-                    },
-                ..
-            } => {}
+            WindowEvent::KeyboardInput { event, .. } => {
+                // Allow shift key presses to not reset multi-click state
+                if let PhysicalKey::Code(KeyCode::ShiftLeft | KeyCode::ShiftRight) =
+                    event.physical_key
+                {
+                    // Don't reset on shift key
+                } else {
+                    self.reset();
+                }
+            }
             _ => {
                 self.reset();
             }

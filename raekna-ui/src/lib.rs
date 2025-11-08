@@ -1,11 +1,15 @@
 use raekna_common::RCalculator;
+use winit::event_loop::EventLoop;
+
+use crate::coordinator::Coordinator;
 
 mod constants;
 mod coordinator;
-mod event_loop;
 mod graphics;
 
-pub fn show_ui(calculator: Box<dyn RCalculator>) {
+pub fn run_app(calculator: Box<dyn RCalculator>) -> Result<(), impl std::error::Error> {
     env_logger::init();
-    event_loop::run_event_loop(calculator);
+    let mut coordinator = Coordinator::new(calculator);
+    let event_loop = EventLoop::new().unwrap();
+    event_loop.run_app(&mut coordinator)
 }

@@ -570,7 +570,7 @@ mod functions {
     #[should_panic]
     fn invalid_function_name() {
         let input = "invalid_function(25)";
-        parse(&input);
+        parse(input);
     }
 }
 
@@ -582,7 +582,7 @@ mod variables {
         let input = "my_var: 5";
 
         let expected = Expression::Variable("my_var".to_owned(), Box::new(int(5)));
-        let actual = parse(&input);
+        let actual = parse(input);
 
         assert_eq!(actual, expected);
     }
@@ -591,7 +591,7 @@ mod variables {
     #[should_panic]
     fn variable_definition_invalid_variable_name() {
         let input = "_my_var: 5";
-        parse(&input);
+        parse(input);
     }
 
     #[test]
@@ -602,7 +602,7 @@ mod variables {
             FunctionName::Add,
             vec![int(5), Expression::VariableRef("my_var".to_owned())],
         );
-        let actual = parse(&input);
+        let actual = parse(input);
 
         assert_eq!(actual, expected);
     }
@@ -611,7 +611,7 @@ mod variables {
     #[should_panic]
     fn variable_reference_invalid_variable_name() {
         let input = "5 + _my_var";
-        parse(&input);
+        parse(input);
     }
 }
 

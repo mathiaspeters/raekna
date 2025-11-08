@@ -83,6 +83,8 @@ mod tests {
     use crate::ops::test_utils::{float, int};
 
     mod test_sqrt {
+        use core::f64;
+
         use super::*;
 
         #[test]
@@ -90,7 +92,7 @@ mod tests {
             let test_cases = [
                 // Integers
                 (int(0), int(0)),
-                (int(2), float(1.4142135623730951)),
+                (int(2), float(f64::consts::SQRT_2)),
                 (int(25), int(5)),
                 // Floats
                 (float(3.5), float(1.8708286933869707)),

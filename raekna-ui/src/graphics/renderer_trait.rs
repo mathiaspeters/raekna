@@ -14,18 +14,18 @@ pub trait RenderBackend {
     fn size(&self) -> PhysicalSize<u32>;
 }
 
-pub struct WgpuRenderBackend {
-    renderer: WgpuRenderer,
+pub struct WgpuRenderBackend<'a> {
+    renderer: WgpuRenderer<'a>,
 }
 
-impl WgpuRenderBackend {
-    pub async fn new(window: &winit::window::Window, controls: &Controls) -> Self {
+impl<'a> WgpuRenderBackend<'a> {
+    pub async fn new(window: &'a winit::window::Window, controls: &Controls) -> Self {
         let renderer = WgpuRenderer::new(window, controls).await;
         Self { renderer }
     }
 }
 
-impl RenderBackend for WgpuRenderBackend {
+impl<'a> RenderBackend for WgpuRenderBackend<'a> {
     fn update(&mut self, controls: &Controls) {
         self.renderer.update(controls);
     }

@@ -5,7 +5,7 @@ use raekna_common::{EditPosition, RCalculator};
 use super::{dimensions::Dimensions, selection::Selection, text_buffer::TextBuffer};
 use crate::{
     constants::TEXT_PADDING,
-    graphics::controls::{caret_position::CaretPosition, Controls},
+    graphics::controls::{Controls, caret_position::CaretPosition},
 };
 
 pub struct Content {

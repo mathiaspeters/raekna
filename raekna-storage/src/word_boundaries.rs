@@ -27,7 +27,7 @@ pub fn find_word_boundaries(
 
 fn generate_sequences(input: &str) -> Vec<CharSequence> {
     let mut sequences = Sequences::new();
-    input.chars().into_iter().enumerate().for_each(|(i, c)| {
+    input.chars().enumerate().for_each(|(i, c)| {
         let ctype = if c.is_alphanumeric() || c == '_' {
             SequenceType::Word
         } else if c.is_whitespace() {
@@ -148,7 +148,7 @@ impl Sequences {
     pub fn increment(&mut self, ctype: SequenceType, index: usize) {
         let last_seq_index = self.seq.len().saturating_sub(1);
         if !self.seq.is_empty() && ctype == self.seq[last_seq_index].seq_type {
-            let mut sequence = &mut self.seq[last_seq_index];
+            let sequence = &mut self.seq[last_seq_index];
             sequence.end += 1
         } else {
             let new_sequence = CharSequence {

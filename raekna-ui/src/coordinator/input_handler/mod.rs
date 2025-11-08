@@ -4,7 +4,7 @@ mod mouse_input_handler;
 pub mod multi_click_state;
 
 use winit::{
-    event::{ModifiersState, VirtualKeyCode},
+    keyboard::{KeyCode, ModifiersState},
     window::CursorIcon,
 };
 
@@ -66,10 +66,7 @@ impl InputHandler {
         }
     }
 
-    pub fn parse_keyboard_input(
-        &self,
-        virtual_keycode: &Option<VirtualKeyCode>,
-    ) -> Option<UserInput> {
+    pub fn parse_keyboard_input(&self, virtual_keycode: &Option<KeyCode>) -> Option<UserInput> {
         UserInput::from_key_code(virtual_keycode, &self.active_modifiers)
     }
 

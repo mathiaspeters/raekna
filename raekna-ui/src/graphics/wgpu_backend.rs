@@ -9,21 +9,24 @@ use crate::{
     coordinator::{content::Content, dimensions::Dimensions},
 };
 
-pub struct WgpuContext {
-    pub surface: wgpu::Surface,
+pub struct WgpuContext<'a> {
+    pub surface: wgpu::Surface<'a>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub config: wgpu::SurfaceConfiguration,
     pub size: PhysicalSize<u32>,
 }
 
-impl WgpuContext {
-    pub async fn new(window: &Window) -> Self {
+impl<'a> WgpuContext<'a> {
+    pub async fn new(window: &'a Window) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
-        let instance = wgpu::Instance::new(wgpu::Backends::all());
-        let surface = unsafe { instance.create_surface(window) };
+        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
+            backends: wgpu::Backends::all(),
+            ..Default::default()
+        });
+        let surface = instance.create_surface(window).unwrap();
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::default(),
@@ -34,22 +37,23 @@ impl WgpuContext {
             .unwrap();
 
         let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: None,
-                    features: wgpu::Features::empty(),
-                    limits: wgpu::Limits::default(),
-                },
-                None, // Trace path
-            )
+            .request_device(&wgpu::DeviceDescriptor {
+                label: None,
+                required_features: wgpu::Features::empty(),
+                required_limits: wgpu::Limits::default(),
+                memory_hints: wgpu::MemoryHints::default(),
+                trace: wgpu::Trace::Off,
+            })
             .await
             .unwrap();
 
-        let render_format = {
-            let supported_formats = surface.get_supported_formats(&adapter);
-            let preferred_format = supported_formats.get(0).unwrap();
-            *preferred_format
-        };
+        let surface_caps = surface.get_capabilities(&adapter);
+        let render_format = surface_caps
+            .formats
+            .iter()
+            .find(|f| f.is_srgb())
+            .copied()
+            .unwrap_or(surface_caps.formats[0]);
 
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -57,6 +61,9 @@ impl WgpuContext {
             width: size.width,
             height: size.height,
             present_mode: wgpu::PresentMode::Fifo,
+            alpha_mode: surface_caps.alpha_modes[0],
+            view_formats: vec![],
+            desired_maximum_frame_latency: 2,
         };
         surface.configure(&device, &config);
 
@@ -85,7 +92,7 @@ pub struct WgpuPipeline {
 }
 
 impl WgpuPipeline {
-    pub fn new(context: &WgpuContext) -> Self {
+    pub fn new<'a>(context: &WgpuContext<'a>) -> Self {
         let shader = context
             .device
             .create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -110,12 +117,13 @@ impl WgpuPipeline {
                     layout: Some(&render_pipeline_layout),
                     vertex: wgpu::VertexState {
                         module: &shader,
-                        entry_point: "vs_main",
+                        entry_point: Some("vs_main"),
                         buffers: &[Vertex::desc()],
+                        compilation_options: wgpu::PipelineCompilationOptions::default(),
                     },
                     fragment: Some(wgpu::FragmentState {
                         module: &shader,
-                        entry_point: "fs_main",
+                        entry_point: Some("fs_main"),
                         targets: &[Some(wgpu::ColorTargetState {
                             format: context.config.format,
                             blend: Some(wgpu::BlendState {
@@ -124,6 +132,7 @@ impl WgpuPipeline {
                             }),
                             write_mask: wgpu::ColorWrites::ALL,
                         })],
+                        compilation_options: wgpu::PipelineCompilationOptions::default(),
                     }),
                     primitive: wgpu::PrimitiveState {
                         topology: wgpu::PrimitiveTopology::TriangleList,
@@ -141,6 +150,7 @@ impl WgpuPipeline {
                         alpha_to_coverage_enabled: false,
                     },
                     multiview: None,
+                    cache: None,
                 });
 
         Self { render_pipeline }
@@ -148,15 +158,15 @@ impl WgpuPipeline {
 }
 
 /// Complete WGPU renderer implementation
-pub struct WgpuRenderer {
-    context: WgpuContext,
+pub struct WgpuRenderer<'a> {
+    context: WgpuContext<'a>,
     pipeline: WgpuPipeline,
     text_painter: TextPainter,
     buffers: Buffers,
 }
 
-impl WgpuRenderer {
-    pub async fn new(window: &Window, controls: &Controls) -> Self {
+impl<'a> WgpuRenderer<'a> {
+    pub async fn new(window: &'a Window, controls: &Controls) -> Self {
         let context = WgpuContext::new(window).await;
         let pipeline = WgpuPipeline::new(&context);
         let text_painter = TextPainter::new(&context.size, &context.device, context.config.format);
@@ -208,10 +218,13 @@ impl WgpuRenderer {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(BACKGROUND_COLOR),
-                        store: true,
+                        store: wgpu::StoreOp::Store,
                     },
+                    depth_slice: None,
                 })],
                 depth_stencil_attachment: None,
+                occlusion_query_set: None,
+                timestamp_writes: None,
             });
 
             render_pass.set_pipeline(&self.pipeline.render_pipeline);
