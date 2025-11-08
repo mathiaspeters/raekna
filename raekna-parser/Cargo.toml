@@ -8,5 +8,5 @@ license = "MPL-2.0"
 repository = "https://github.com/mathiaspeters/raekna"
 
 [dependencies]
-nom = "7.1"
+nom = "8.0"
 raekna-common = "0.2"

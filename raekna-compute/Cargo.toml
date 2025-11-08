@@ -11,4 +11,4 @@ repository = "https://github.com/mathiaspeters/raekna"
 raekna-common = "0.2"
 
 [dev-dependencies]
-proptest = "1.0.0"
+proptest = "1.9"

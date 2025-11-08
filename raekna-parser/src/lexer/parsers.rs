@@ -1,15 +1,12 @@
 use nom::{
     branch::alt,
     bytes::complete::{is_not, tag, take_while},
-    character::{
-        complete::{char, one_of},
-        is_alphanumeric,
-    },
+    character::complete::{char, one_of},
     combinator::{map, map_res, opt, recognize, verify},
     error::{ErrorKind, ParseError},
     multi::{many0, many1, separated_list0},
-    sequence::{pair, preceded, terminated, tuple},
-    IResult,
+    sequence::{pair, preceded, terminated},
+    AsChar, IResult, Parser,
 };
 use number_parsers::*;
 use raekna_common::expression::Literal;
@@ -40,7 +37,8 @@ pub fn parse_number(input: &str) -> IResult<&str, Token> {
             }),
             map(integer, Literal::Integer),
         )),
-    )(input)?;
+    )
+    .parse(input)?;
     Ok((remaining, Token::Literal(literal)))
 }
 
@@ -55,14 +53,16 @@ pub fn operator(input: &str) -> IResult<&str, Token> {
             map(char('%'), |_| Operator::Modulo),
             map(char('^'), |_| Operator::Power),
         )),
-    )(input)?;
+    )
+    .parse(input)?;
     Ok((remaining, Token::Operator(operator)))
 }
 
 pub fn nested(input: &str) -> IResult<&str, Token> {
     map_res(preceded(whitespace, parentheses()), |n| {
         TokenTree::parse_input(n).map(|(_, token_tree)| Token::Nested(token_tree))
-    })(input)
+    })
+    .parse(input)
 }
 
 pub fn function(input: &str) -> IResult<&str, Token> {
@@ -75,7 +75,8 @@ pub fn function(input: &str) -> IResult<&str, Token> {
             |(f_name, e)| function_arguments(e).map(|e| (f_name, e)),
         ),
         |(f_name, (_, args))| Token::Function(f_name.to_owned(), args),
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn variable_definition(input: &str) -> IResult<&str, Token> {
@@ -85,13 +86,15 @@ pub fn variable_definition(input: &str) -> IResult<&str, Token> {
             pair(identifier, preceded(whitespace, char(':'))),
         ),
         |(ident, _)| Token::VariableDefinition(ident.to_owned()),
-    )(input)
+    )
+    .parse(input)
 }
 
 pub fn variable_reference(input: &str) -> IResult<&str, Token> {
     map(preceded(whitespace, identifier), |ident| {
         Token::VariableReference(ident.to_owned())
-    })(input)
+    })
+    .parse(input)
 }
 
 mod number_parsers {
@@ -103,9 +106,10 @@ mod number_parsers {
         // Exponent can only be an integer
         let exponent = integer;
         map_res(
-            recognize(tuple((factor, one_of("eE"), opt(char('-')), exponent))),
+            recognize((factor, one_of("eE"), opt(char('-')), exponent)),
             to_f64,
-        )(input)
+        )
+        .parse(input)
     }
 
     /// Parses floating point numbers
@@ -113,23 +117,20 @@ mod number_parsers {
     pub fn float(input: &str) -> IResult<&str, f64> {
         map_res(
             alt((
-                recognize(tuple((char('.'), decimal))),
-                recognize(tuple((
-                    decimal,
-                    char('.'),
-                    opt(tuple((opt(char('-')), decimal))),
-                ))),
+                recognize((char('.'), decimal)),
+                recognize((decimal, char('.'), opt((opt(char('-')), decimal)))),
             )),
             to_f64,
-        )(input)
+        )
+        .parse(input)
     }
 
     pub fn integer(input: &str) -> IResult<&str, i64> {
-        map_res(recognize(decimal), to_i64)(input)
+        map_res(recognize(decimal), to_i64).parse(input)
     }
 
     fn decimal(input: &str) -> IResult<&str, &str> {
-        recognize(many1(terminated(one_of("0123456789"), many0(char('_')))))(input)
+        recognize(many1(terminated(one_of("0123456789"), many0(char('_'))))).parse(input)
     }
 
     fn to_i64(input: &str) -> Result<i64, std::num::ParseIntError> {
@@ -146,9 +147,10 @@ mod text_parsers {
 
     pub fn identifier(input: &str) -> IResult<&str, &str> {
         verify(
-            take_while(|c| c == '_' || is_alphanumeric(c as u8)),
+            take_while(|c: char| c == '_' || c.is_alphanum()),
             |s: &str| s.chars().next().map(|c| c.is_alphabetic()).unwrap_or(false),
-        )(input)
+        )
+        .parse(input)
     }
 
     pub fn function_arguments(input: &str) -> IResult<&str, Vec<TokenTree>> {
@@ -162,7 +164,8 @@ mod text_parsers {
                     .map(|s| TokenTree::parse_input(s).map(|(_, a)| a))
                     .collect::<Result<Vec<_>, _>>()
             },
-        )(input)
+        )
+        .parse(input)
     }
 
     pub fn parentheses() -> impl Fn(&str) -> IResult<&str, &str> {
@@ -198,7 +201,7 @@ mod text_parsers {
     }
 
     pub fn whitespace(input: &str) -> IResult<&str, &str> {
-        take_while(|c: char| c.is_whitespace())(input)
+        take_while(|c: char| c.is_whitespace()).parse(input)
     }
 }
 

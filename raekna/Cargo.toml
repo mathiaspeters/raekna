@@ -15,7 +15,7 @@ raekna-storage = "0.2"
 raekna-ui      = "0.2"
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = "0.7"
 
 [[bench]]
 name = "benchmarks"
